@@ -1,6 +1,6 @@
 FROM golang:1.8.3
 
-RUN go get -v github.com/tendermint/abci/tree/master/example/counter
+RUN go get -v github.com/tendermint/abci/cmd/...
 
 EXPOSE 46658
 
