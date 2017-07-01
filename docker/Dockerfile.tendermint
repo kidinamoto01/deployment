@@ -40,6 +40,8 @@ EXPOSE 46656
 # rpc port
 EXPOSE 46657
 
+
 ENTRYPOINT ["tendermint"]
 
-CMD ["node", "--moniker=`node1`"]
+# By default you'll get the dummy app
+# CMD ["node", "--moniker=`hostname`", "--proxy_app=dummy"]

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+NETWORK_NAME=testNet
+DOCKER_APP=./Dockerfile.sample_app
+DOCKER_PROXY=./Dockerfile.proxy
+DOCKER_TENDERMINT=./Dockerfile.tendermint
+
+
+# CREATE NETWORK AND IMAGES
+
+docker network create $NETWORK_NAME
+
+echo "Launching app"
+#screen -dmS test bash -c 'docker run -it --name app --net=$NETWORK_NAME app; exec bash'
+screen -dmS test bash -c 'docker run -it --name app --net=testNet app; exec bash'
+sleep 2
+echo "Launching proxy"
+#screen -dmS test bash -c 'docker run -it --name proxy --net=$NETWORK_NAME proxy /bin/bash'
+screen -dmS test bash -c 'docker run -it --name proxy --net=testNet proxy'
+
+
+# screen -dmS test bash -c 'docker run -it --name proxy --net=$NETWORK_NAME proxy /bin/bash; exec bash'
+# docker run -it --name proxy --net=$NETWORK_NAME proxy
+# docker run -it --name tendermint --net=$NETWORK_NAME tendermint
