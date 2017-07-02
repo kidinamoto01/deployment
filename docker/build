@@ -2,16 +2,14 @@
 
 NETWORK_NAME=testNet
 # DOCKER_APP=./Dockerfile.sample_app
-DOCKER_APP=./Dockerfile.myapp
+DOCKER_APP=./Dockerfile.app
 DOCKER_PROXY=./Dockerfile.proxy
 DOCKER_TENDERMINT=./Dockerfile.tendermint
 
-rm Dockerfile.myapp
-touch Dockerfile.myapp
-echo "FROM golang:1.8" >> Dockerfile.myapp
-echo "RUN go get -v ${1}/${2}/..." >> Dockerfile.myapp
-echo "EXPOSE 46659" >> Dockerfile.myapp
-echo "CMD [\"$2\"]" >> Dockerfile.myapp
+rm Dockerfile.app
+cp Dockerfile.app.template Dockerfile.app
+echo "RUN go get -v ${1}/${2}/..." >> Dockerfile.app
+echo "CMD [\"$2\"]" >> Dockerfile.app
 
 
 
