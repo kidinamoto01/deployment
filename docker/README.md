@@ -1,13 +1,10 @@
+# To build the docker image (build github program_name)
 
-
-# To build the docker image 
-
-./build
+./build  github.com/multiverseHQ/abci_sample abci_counter
 
 # To create the instance
 
 ./create
-
 
 # To clean the instance  (if you want to run create again)
 

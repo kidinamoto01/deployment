@@ -33,7 +33,6 @@ RUN apk add --no-cache openssl && \
     rm -f tendermint_${TM_VERSION}_linux_amd64.zip
 
 # Expose the data directory as a volume since there's mutable state in there
-VOLUME $DATA_ROOT
 
 # p2p port
 EXPOSE 46656
