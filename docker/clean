@@ -1,6 +1,9 @@
 #!/bin/bash
 
-NETWORK_NAME=testNet
+SUFFIX=$1
+NETWORK_NAME=testNet$SUFFIX
+TENDERMINT_DATA=tendermintData$SUFFIX
+
 DOCKER_APP=./Dockerfile.sample_app
 DOCKER_PROXY=./Dockerfile.proxy
 DOCKER_TENDERMINT=./Dockerfile.tendermint
@@ -8,9 +11,15 @@ DOCKER_TENDERMINT=./Dockerfile.tendermint
 
 # CLEAN
 
-docker network rm $NETWORK_NAME
+ps -aux |grep 'SCREEN' | grep -v 'grep' | awk '{print $2}' | xargs kill
+
 docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker stop 
 docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker rm 
 
+docker volume rm $TENDERMINT_DATA
+docker network rm $NETWORK_NAME
+
 # docker images | grep -v 'REPOSITORY' | awk '{print $3}' | xargs docker rmi -f
+
+
 
