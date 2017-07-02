@@ -1,14 +1,5 @@
 #!/bin/bash
 
-SUFFIX=$1
-NETWORK_NAME=testNet$SUFFIX
-TENDERMINT_DATA=tendermintData$SUFFIX
-
-DOCKER_APP=./Dockerfile.sample_app
-DOCKER_PROXY=./Dockerfile.proxy
-DOCKER_TENDERMINT=./Dockerfile.tendermint
-
-
 # CLEAN
 
 ps -aux |grep 'SCREEN' | grep -v 'grep' | awk '{print $2}' | xargs kill
@@ -16,10 +7,14 @@ ps -aux |grep 'SCREEN' | grep -v 'grep' | awk '{print $2}' | xargs kill
 docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker stop 
 docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker rm 
 
-docker volume rm $TENDERMINT_DATA
-docker network rm $NETWORK_NAME
-
 # docker images | grep -v 'REPOSITORY' | awk '{print $3}' | xargs docker rmi -f
 
 
 
+for SUFFIX in $*
+do
+	NETWORK_NAME=testNet$SUFFIX
+	TENDERMINT_DATA=tendermintData$SUFFIX
+	docker volume rm $TENDERMINT_DATA
+	docker network rm $NETWORK_NAME	
+done

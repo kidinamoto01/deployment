@@ -4,7 +4,7 @@
 
 # To create the instance
 
-./create
+./create node1
 
 # To clean the instance  (if you want to run create again)
 
