@@ -7,12 +7,6 @@ SCREEN_NAME=screen$1
 NETWORK_NAME=testNet$SUFFIX
 TENDERMINT_DATA=tendermintData$SUFFIX
 
-DOCKER_APP=./Dockerfile.myapp
-DOCKER_PROXY=./Dockerfile.proxy
-DOCKER_TENDERMINT=./Dockerfile.tendermint
-
-
-
 # CREATE NETWORK, VOLUME AND IMAGES
 
 docker network create $NETWORK_NAME
