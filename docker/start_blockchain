@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+MAINNET_NAME=blockchain
+NETWORK_NAME=testNet
+TENDERMINT_NAME=tendermint
+
+docker network create --driver=bridge $MAINNET_NAME
+
+# echo $*
+
+# Goal : connect the different network to the different tendermintX instance
+
+for M in $*
+do
+	echo connect general $MAINNET_NAME network to tendermint node $TENDERMINT_NAME$M
+	docker network connect $MAINNET_NAME $TENDERMINT_NAME$M
+done
+ 
+
+for M in $*
+do
+	cmdTendermint="docker start -a -i tendermint$M"
+	screen -dmS tendermint$M bash -c "$cmdTendermint; exec bash"
+done
+
+
+
+
+echo "Create Genesis file"
