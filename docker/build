@@ -5,7 +5,7 @@ DOCKER_PROXY=./Dockerfile.proxy
 DOCKER_TENDERMINT=./Dockerfile.tendermint
 
 rm $DOCKER_APP
-cp $DOCKER_APP.template $DOCKER_APP
+cp Dockerfile.app.template $DOCKER_APP
 echo "RUN go get -v ${1}/${2}/..." >> $DOCKER_APP
 echo "CMD [\"$2\"]" >> $DOCKER_APP
 
