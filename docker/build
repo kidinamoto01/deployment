@@ -1,15 +1,13 @@
 #!/bin/bash
 
-NETWORK_NAME=testNet
-# DOCKER_APP=./Dockerfile.sample_app
 DOCKER_APP=./Dockerfile.app
 DOCKER_PROXY=./Dockerfile.proxy
 DOCKER_TENDERMINT=./Dockerfile.tendermint
 
-rm Dockerfile.app
-cp Dockerfile.app.template Dockerfile.app
-echo "RUN go get -v ${1}/${2}/..." >> Dockerfile.app
-echo "CMD [\"$2\"]" >> Dockerfile.app
+rm $DOCKER_APP
+cp $DOCKER_APP.template $DOCKER_APP
+echo "RUN go get -v ${1}/${2}/..." >> $DOCKER_APP
+echo "CMD [\"$2\"]" >> $DOCKER_APP
 
 
 
