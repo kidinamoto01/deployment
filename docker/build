@@ -1,0 +1,15 @@
+#!/bin/bash
+
+NETWORK_NAME=testNet
+DOCKER_APP=./Dockerfile.sample_app
+DOCKER_PROXY=./Dockerfile.proxy
+DOCKER_TENDERMINT=./Dockerfile.tendermint
+
+
+
+# BUILD 
+
+docker build -f $DOCKER_APP -t app:latest .
+docker build -f $DOCKER_PROXY -t proxy:latest .
+docker build -f $DOCKER_TENDERMINT -t tendermint:latest .
+
