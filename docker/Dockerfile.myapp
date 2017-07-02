@@ -1,0 +1,4 @@
+FROM golang:1.8
+RUN go get -v //...
+EXPOSE 46659
+CMD [""]
