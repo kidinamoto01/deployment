@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# CLEAN
+MAINNET_NAME=blockchain
+NETWORK_NAME=testNet
+TENDERMINT_NAME=tendermint
+
 
 ps -aux |grep 'SCREEN' | grep -v 'grep' | awk '{print $2}' | xargs kill
 
@@ -13,8 +16,10 @@ docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker rm
 
 for SUFFIX in $*
 do
-	NETWORK_NAME=testNet$SUFFIX
+	NET_NAME=$NETWORK_NAME$SUFFIX
 	TENDERMINT_DATA=tendermintData$SUFFIX
 	docker volume rm $TENDERMINT_DATA
-	docker network rm $NETWORK_NAME	
+	docker network rm $NET_NAME	
 done
+
+docker network rm $MAINNET_NAME
