@@ -1,8 +1,15 @@
 #!/usr/bin/python
 import json,sys
 
-def get_validator( node ):
-    full_path = "{}{}".format(path.replace('__NODE__',node),validator_file)
+validator_file = "priv_validator.json"
+genesis_file = "genesis.json"
+
+
+#path = "/var/lib/docker/volumes/tendermintData1/_data/"
+#path = sys.argv[1] + "/_data/"
+
+def get_validator( path ):
+    full_path = "{}/{}".format(path,validator_file)
     with open(full_path) as json_data:
         tbl = json.load(json_data)
         for t in tbl:
@@ -15,38 +22,26 @@ def get_validator( node ):
     return validator
 
 
+def get_validators( list ):
+    validators = []
+    for i,v in enumerate( list):
+       # print v
+       validators.append(get_validator(v))
+    return validators
 
-path = "/var/lib/docker/volumes/tendermintData__NODE__/_data/"
-
-validator_file = "priv_validator.json"
-genesis_file = "genesis.json"
-genesis_full_path  = "{}{}".format(path.replace('__NODE__','1'),genesis_file)
-
-with open(genesis_full_path) as json_data:
-    genesis = json.load(json_data)
-
-
-genesis['validators'] = []
+sys.argv.pop(0)
+chain_id = sys.argv.pop(0)
+validators = get_validators( sys.argv )
 
 for i,v in enumerate(sys.argv):
-    if i != 0:
-        genesis['validators'].append(get_validator(v))
+    if True:
+        genesis_full_path  = "{}/{}".format(v,genesis_file)
+        with open(genesis_full_path) as json_data:
+            genesis = json.load(json_data)
 
-
-
-
-print(json.dumps(genesis))
-
-#{"genesis_time":"0001-01-01T00:00:00Z","chain_id":"test-chain-e8W3qd","validators":[
-#{"pub_key":
-#{"type":"ed25519","data":"EC821183046A81795F616627095B59FC079A51A559239EC35F19B62ABD8454BA"}
-#,"amount":10,"name":""}
-#,
-#{"pub_key":
-#{"type":"ed25519","data":"F1F1ED90D5F531FC51AB1CF3A778E9EF9DD40E86C8391B40ED83BAE29A38C6D6"}
-#,"amount":10,"name":""}
-#,
-#{"pub_key":
-#{"type":"ed25519","data":"474D42AA963B76493C90701B3B85FCED5DE83B9071979F01B91DF163BFC66159"}
-#,"amount":10,"name":""}
-
+	genesis['validators'] = validators
+	genesis['chain_id'] = chain_id
+        # print(json.dumps(genesis))
+        # print(genesis_full_path)
+        open(genesis_full_path, 'w').close()
+        open(genesis_full_path, 'w').write(json.dumps(genesis))

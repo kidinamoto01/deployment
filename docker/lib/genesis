@@ -1,28 +1,26 @@
 #!/bin/bash
 
 PORT=46656
-
-rm ./data/genesis.json 2>/dev/null
-touch ./data/genesis.json
-
-echo `./genesisGenerate.py $*` >> ./data/genesis.json
-
-
 p2pseeds=
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-for M in $*
+
+volumesPath=
+for M in "${@:2}"
 do
-	p2pseeds=$p2pseeds,tendermint$M:$PORT
-	volumePath=`docker volume inspect tendermintData$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
-	cp ./data/genesis.json $volumePath
+	p2pseeds=$p2pseeds,tendermint$1$M:$PORT
+	volumePath=`docker volume inspect $1$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
+	volumesPath="$volumesPath $volumePath"
 done
 
 p2pseeds="${p2pseeds:1:${#p2pseeds}}"
-echo $p2pseeds
+volumesPath="${volumesPath:1:${#volumesPath}}"
 
-for M in $*
+$scriptPath/genesisGenerate.py $1 $volumesPath
+
+for M in "${@:2}"
 do 
-	volumePath=`docker volume inspect tendermintData$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
-	find $volumePath/config.toml | xargs perl -pi -e "s/seeds = \"\"/seeds = \"$p2pseeds\"/g"
-	find $volumePath/config.toml | xargs perl -pi -e "s/proxy_app.*/proxy_app = \"tcp:\/\/proxy$M:46658\"/g"
+	volumePath=`docker volume inspect $1$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
+	find $volumePath/config.toml | xargs perl -pi -e "s/seeds.*/seeds = \"$p2pseeds\"/g"
+	find $volumePath/config.toml | xargs perl -pi -e "s/proxy_app.*/proxy_app = \"tcp:\/\/proxy$1$M:46658\"/g"
 done

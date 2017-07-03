@@ -1,27 +1,20 @@
 #!/bin/bash
 
-
-MAINNET_NAME=blockchain
-NETWORK_NAME=testNet
-TENDERMINT_NAME=tendermint
-
-docker network create --driver=bridge $MAINNET_NAME
+docker network create --driver=bridge $1
 
 # echo $*
+# Goal : connect the different network to the different tendermint$CHAIN_ID$NODE instance
 
-# Goal : connect the different network to the different tendermintX instance
-
-for M in $*
+for M in "${@:2}"
 do
-	echo connect general $MAINNET_NAME network to tendermint node $TENDERMINT_NAME$M
-	docker network connect $MAINNET_NAME $TENDERMINT_NAME$M
+	echo connect general $1 network to tendermint node $TENDERMINT_NAME$M
+	docker network connect $1 tendermint$1$M
 done
  
-
-for M in $*
+for M in "${@:2}"
 do
-	cmdTendermint="docker start -a -i tendermint$M"
-	screen -dmS tendermint$M bash -c "$cmdTendermint; exec bash"
+	cmdTendermint="docker start -a -i tendermint$1$M"
+	screen -dmS tendermint$1$M bash -c "$cmdTendermint; exec bash"
 done
 
 

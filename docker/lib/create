@@ -1,48 +1,11 @@
-#!/bin/bash
+#!/bin/bash 
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-SUFFIX=$1
-
-
-SCREEN_NAME=screen$1
-NETWORK_NAME=testNet$SUFFIX
-TENDERMINT_DATA=tendermintData$SUFFIX
-
-# CREATE NETWORK, VOLUME AND IMAGES
-
-docker network create $NETWORK_NAME
-docker volume create --name $TENDERMINT_DATA
+for M in "${@:2}"
+do
+	$scriptPath/createOne $1 $M
+done
 
 
-echo "Launching app"
-cmdApp="docker run -it --name app$SUFFIX --net=$NETWORK_NAME app; exec bash"
-echo $cmdApp
-screen -dmS app$SUFFIX bash -c "$cmdApp"
+$scriptPath/enableCommunication "${@:1}"
 
-
-sleep 1
-echo "Launching proxy"
-cmdProxy="docker run -it --name proxy$SUFFIX --net=$NETWORK_NAME proxy abci_proxy -proxy=tcp://app$SUFFIX:46659 -v; exec bash"
-echo $cmdProxy
-screen -dmS proxy$SUFFIX bash -c "$cmdProxy"
-
-
-sleep 1
-echo "Generating json file in data/pub_key.json"
-# docker run -it --rm --net=$NETWORK_NAME --volume=$TENDERMINT_DATA:/tendermint tendermint tendermint gen_validator | python -c '
-docker run -it --rm --net=$NETWORK_NAME --volume=$TENDERMINT_DATA:/tendermint tendermint tendermint --home=/tendermint init 
-# | python -c '
-# import json, sys
-# tbl=json.load(sys.stdin)
-# for t in tbl:
-#   if t == "pub_key":
-#      print json.dumps(tbl[t]);
-#' > data/pub_key$1.json
-
-
-sleep 1
-echo "Creating tendermint"
-docker run -it --net=$NETWORK_NAME --name tendermint$SUFFIX --volume=$TENDERMINT_DATA:/tendermint tendermint
-
-# cmdTendermint="docker run -it --name tendermint$SUFFIX --net=$NETWORK_NAME --volume=$TENDERMINT_DATA:/tendermint tendermint node --proxy_app=tcp://proxy$SUFFIX:46658; exec bash"
-# echo $cmdTendermint
-# screen -dmS tendermint$SUFFIX bash -c "$cmdTendermint"

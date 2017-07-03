@@ -1,25 +1,15 @@
 #!/bin/bash
 
-MAINNET_NAME=blockchain
-NETWORK_NAME=testNet
-TENDERMINT_NAME=tendermint
-
-
 ps -aux |grep 'SCREEN' | grep -v 'grep' | awk '{print $2}' | xargs kill
-
 docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker stop 
 docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker rm 
 
-# docker images | grep -v 'REPOSITORY' | awk '{print $3}' | xargs docker rmi -f
-
-
-
-for SUFFIX in $*
+for SUFFIX in "${@:2}"
 do
-	NET_NAME=$NETWORK_NAME$SUFFIX
-	TENDERMINT_DATA=tendermintData$SUFFIX
+	NET_NAME=$1$SUFFIX
+	TENDERMINT_DATA=$1$SUFFIX
 	docker volume rm $TENDERMINT_DATA
 	docker network rm $NET_NAME	
 done
 
-docker network rm $MAINNET_NAME
+docker network rm $1
