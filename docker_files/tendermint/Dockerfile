@@ -44,6 +44,8 @@ EXPOSE 46657
 
 COPY ./tendermint-entrypoint.sh /
 
+RUN chmod 777 /tendermint-entrypoint.sh
+
 ENTRYPOINT ["/tendermint-entrypoint.sh"]
 
 # RUN tendermint init --home=$TMHOME --log_level "debug" 
