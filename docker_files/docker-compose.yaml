@@ -1,0 +1,20 @@
+version: '3'
+services:
+  my_app:
+    build: ./app/.
+  my_proxy:
+    build: ./proxy/.
+    environment:
+      - APP_IP=my_app
+    depends_on:
+      - "my_app"
+  my_tendermint:
+    build: ./tendermint/.
+    volumes:
+    - /tmp:/tendermint
+    environment:
+      - PROXY_IP=my_proxy
+      - DATA_ROOT=/tendermint
+    depends_on:
+      - "my_proxy"
+  
