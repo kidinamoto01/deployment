@@ -1,0 +1,26 @@
+#!/bin/bash
+
+PORT=46656
+p2pseeds=
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+volumesPath=
+for M in "${@:2}"
+do
+	p2pseeds=$p2pseeds,tendermint$1$M:$PORT
+	volumePath=`docker volume inspect $1$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
+	volumesPath="$volumesPath $volumePath"
+done
+
+p2pseeds="${p2pseeds:1:${#p2pseeds}}"
+volumesPath="${volumesPath:1:${#volumesPath}}"
+
+$scriptPath/genesisGenerate.py $1 $volumesPath
+
+for M in "${@:2}"
+do 
+	volumePath=`docker volume inspect $1$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
+	find $volumePath/config.toml | xargs perl -pi -e "s/seeds.*/seeds = \"$p2pseeds\"/g"
+	find $volumePath/config.toml | xargs perl -pi -e "s/proxy_app.*/proxy_app = \"tcp:\/\/proxy$1$M:46658\"/g"
+done
