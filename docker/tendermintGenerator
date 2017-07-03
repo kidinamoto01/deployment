@@ -1,0 +1,45 @@
+#!/bin/python
+
+import argparse
+import subprocess
+import os
+from subprocess import Popen, PIPE
+
+parser = argparse.ArgumentParser(prog='PROG')
+
+
+
+
+parser.add_argument("-m", "--nodesName", help="node names, coma separated list", default="1")
+parser.add_argument("-i", "--chainId", help="chain unique ID", default="TEST")
+parser.add_argument("-e", "--execname", help="name of the executable", action="store_true", default="abci_counter")
+parser.add_argument("-g", "--gitrepo", help="git repository of the app", action="store_true", default="github.com/multiverseHQ/abci_sample")
+parser.add_argument("-v", "--verbose", help="verbose", action="store_true", default="")
+
+
+subparsers = parser.add_subparsers(dest="module",help='sub-command help')
+parser_clean = subparsers.add_parser('delete', help='erase a chain')
+parser_create = subparsers.add_parser('create', help='create a chain')
+parser_create.add_argument("-t", "--terraform", help="build as terraform node", action="store_true")
+
+
+def get_script_path(file):
+   return '{}/lib/{}'.format(os.path.dirname(os.path.realpath(__file__)),file)
+
+
+args = parser.parse_args()
+
+
+
+if args.module in ['delete'] :
+   delete = Popen([get_script_path('clean')]+[args.chainId]+args.nodesName.split(","))
+   delete.wait()   
+
+if args.module in ['create'] :
+   print "---------------- Create ------------------"
+   create = Popen([get_script_path('create')]+[args.chainId]+args.nodesName.split(","))
+   create.wait()
+   print "---------------- Genesis -----------------"
+   genesis = Popen([get_script_path('genesis')]+[args.chainId]+args.nodesName.split(","))
+   genesis.wait()
+
