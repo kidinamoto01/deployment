@@ -3,8 +3,9 @@ set -e
 
 ## DO TENDERMINT INIT IF WE NEED TO GENERATE PUB_KEY/PRIVATE AND GENESIS FILE
 if [ -z "$(ls -A "$PGDATA")" ]; then
-    tendermint init --home=$TMHOME --log_level "debug" 
 
+	tendermint init --home=$TMHOME --log_level "debug" 
+	
 	## COPY THE PUB KEY INTO THE NGINX SERVER FOLDER
 	cp /tendermint/PUB_KEY_HERE.json /pubkey
 	
