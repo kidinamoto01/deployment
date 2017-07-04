@@ -2,12 +2,15 @@
 set -e
 
 ## DO TENDERMINT INIT IF PRIV_KEY DOESN"T EXIST /tendermint/priv_validator.json (We need to generate then priv/pub key & genenis.json)
-if [ -z "$(ls -A "$PGDATA")" ]; then
+if [ ! -f /tendermint/priv_validator.json ]; then
 
 	tendermint init --home=$TMHOME --log_level "debug" 
 
 	## COPY THE PUB KEY INTO THE NGINX SERVER FOLDER
-	cp /tendermint/PUB_KEY_HERE.json /pubkey
+
+	cat /tendermint/priv_validator.json | jq \".pub_key\" > /tendermint/pub_key.json
+
+	cp /tendermint/pub_key.json /pubkey
 	
 	## CREATE THE GENESIS FILE 
 	# fill genesis file with validators
