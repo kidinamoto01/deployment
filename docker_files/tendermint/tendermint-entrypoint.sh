@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-## DO TENDERMINT INIT IF WE NEED TO GENERATE PUB_KEY/PRIVATE AND GENESIS FILE
+## DO TENDERMINT INIT IF PRIV_KEY DOESN"T EXIST /tendermint/priv_validator.json (We need to generate then priv/pub key & genenis.json)
 if [ -z "$(ls -A "$PGDATA")" ]; then
 
 	tendermint init --home=$TMHOME --log_level "debug" 
-	
+
 	## COPY THE PUB KEY INTO THE NGINX SERVER FOLDER
 	cp /tendermint/PUB_KEY_HERE.json /pubkey
 	
