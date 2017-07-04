@@ -8,7 +8,7 @@ if [ ! -f /tendermint/priv_validator.json ]; then
 
 	## COPY THE PUB KEY INTO THE NGINX SERVER FOLDER
 
-	cat /tendermint/priv_validator.json | jq \".pub_key\" > /tendermint/pub_key.json
+	cat /tendermint/priv_validator.json | jq ".pub_key" > /tendermint/pub_key.json
 
 	cp /tendermint/pub_key.json /pubkey
 	
