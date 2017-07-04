@@ -8,15 +8,22 @@
 
 ## Examples 
 
-1. Create a blockchain with three nodes
+1. Create a blockchain 
+
+Example with three nodes:
 
 ```
-./tendermintGenerator --nodesName=Node1,Node2,Node3 --chainId=PrivateBlockchain create
+
+./tendermintGenerator --nodesName=1,2,3 --chainId=abcd create -t=46658,46659,46660 -p=46558,46559,46560 -a=401,402,403
+
 ```
+
 2. Delete the corresponding blockchain
 
 ```
-./tendermintGenerator --nodesName=Node1,Node2,Node3 --chainId=PrivateBlockchain delete
+./tendermintGenerator --nodesName=1,2,3 --chainId=abcd delete
+
+
 ```
 
 

@@ -10,7 +10,8 @@ parser = argparse.ArgumentParser(prog='PROG')
 
 
 
-parser.add_argument("-m", "--nodesName", help="node names, coma separated list", default="1")
+parser.add_argument("-n", "--nodesName", help="node names, coma separated list of nodes", default="1")
+
 parser.add_argument("-i", "--chainId", help="chain unique ID", default="TEST")
 parser.add_argument("-e", "--execname", help="name of the executable", action="store_true", default="abci_counter")
 parser.add_argument("-g", "--gitrepo", help="git repository of the app", action="store_true", default="github.com/multiverseHQ/abci_sample")
@@ -18,18 +19,22 @@ parser.add_argument("-v", "--verbose", help="verbose", action="store_true", defa
 
 
 subparsers = parser.add_subparsers(dest="module",help='sub-command help')
+
 parser_clean = subparsers.add_parser('delete', help='erase a chain')
+
+parser_build = subparsers.add_parser('delete', help='erase a chain')
+
 parser_create = subparsers.add_parser('create', help='create a chain')
-parser_create.add_argument("-t", "--terraform", help="build as terraform node", action="store_true")
+parser_create.add_argument("-t", "--tendermintExposedPort", help="exposed tendermint ports", default="46656")
+parser_create.add_argument("-p", "--proxyExposedPort", help="exposed proxy ports", default="46456")
+parser_create.add_argument("-a", "--appExposedPort", help="exposed app ports", default="46256")
+
 
 
 def get_script_path(file):
    return '{}/lib/{}'.format(os.path.dirname(os.path.realpath(__file__)),file)
 
-
 args = parser.parse_args()
-
-
 
 if args.module in ['delete'] :
    delete = Popen([get_script_path('clean')]+[args.chainId]+args.nodesName.split(","))
@@ -37,9 +42,32 @@ if args.module in ['delete'] :
 
 if args.module in ['create'] :
    print "---------------- Create ------------------"
-   create = Popen([get_script_path('create')]+[args.chainId]+args.nodesName.split(","))
-   create.wait()
+
+   tPorts = args.tendermintExposedPort.split(",")
+   pPorts = args.proxyExposedPort.split(",")
+   aPorts = args.appExposedPort.split(",")
+   nodeNames = args.nodesName.split(",")
+
+   for n,p,a in map(None,nodeNames, pPorts,aPorts):
+      create = Popen([get_script_path('createOne')]+[args.chainId]+[n,p,a])
+      create.wait()
+
    print "---------------- Genesis -----------------"
-   genesis = Popen([get_script_path('genesis')]+[args.chainId]+args.nodesName.split(","))
+   genesis = Popen([get_script_path('genesis')]+[args.chainId]+nodeNames)
    genesis.wait()
 
+   print "---------------- Start -----------------"
+   print "ready !"
+
+   for n,t in map(None,nodeNames, tPorts):
+      start = Popen([get_script_path('startTendermint')]+[args.chainId]+[n,t])
+      start.wait()
+
+   print "---------------- Wait -----------------"
+   sleep = Popen(['sleep','3'])
+   sleep.wait()
+
+
+   print "---------------- enable inter-tendermint communication -----------------"
+   enableCommunication = Popen([get_script_path('enableCommunication')]+[args.chainId]+nodeNames)
+   enableCommunication.wait()

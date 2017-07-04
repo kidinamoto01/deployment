@@ -1,0 +1,12 @@
+#!/bin/bash
+
+CHAIN_ID=$1
+SUFFIX=$2
+TENDERMINT_PORT=$3
+
+NETWORK_NAME=$CHAIN_ID$SUFFIX
+TENDERMINT_DATA=${CHAIN_ID}$SUFFIX
+
+echo "Launching tendermint instance"
+cmdTendermint="docker run -it -p $TENDERMINT_PORT:46656 --net=$NETWORK_NAME --name=tendermint$CHAIN_ID$SUFFIX --volume=$TENDERMINT_DATA:/tendermint tendermint tendermint --home=/tendermint node"
+screen -dmS tendermint$CHAIN_ID$SUFFIX bash -c "$cmdTendermint"

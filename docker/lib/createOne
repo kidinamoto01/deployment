@@ -2,7 +2,8 @@
 
 CHAIN_ID=$1
 SUFFIX=$2
-
+PROXY_PORT=$3
+APP_PORT=$4
 
 SCREEN_NAME=screen$1
 
@@ -18,20 +19,15 @@ docker volume create --name $TENDERMINT_DATA
 
 
 echo "Launching app"
-cmdApp="docker run -it --name app$CHAIN_ID$SUFFIX --net=$NETWORK_NAME app; exec bash"
-echo $cmdApp
+cmdApp="docker run -p $APP_PORT:$APP_PORT -it --name app$CHAIN_ID$SUFFIX --net=$NETWORK_NAME app; exec bash"
+#echo $cmdApp
 screen -dmS app$CHAIN_ID$SUFFIX bash -c "$cmdApp"
 
-
-sleep 1
 echo "Launching proxy"
-cmdProxy="docker run -it --name proxy$CHAIN_ID$SUFFIX --net=$NETWORK_NAME proxy abci_proxy -proxy=tcp://app$CHAIN_ID$SUFFIX:46659 -v; exec bash"
-echo $cmdProxy
+cmdProxy="docker run -p $PROXY_PORT:46659 -it --name proxy$CHAIN_ID$SUFFIX --net=$NETWORK_NAME proxy abci_proxy -proxy=tcp://app$CHAIN_ID$SUFFIX:46659 -v; exec bash"
+#echo $cmdProxy
 screen -dmS proxy$CHAIN_ID$SUFFIX bash -c "$cmdProxy"
 
-
-sleep 1
 echo "Init tendermint"
 docker run -it --rm --net=$NETWORK_NAME --volume=$TENDERMINT_DATA:/tendermint tendermint tendermint --home=/tendermint init 
-echo "Creating tendermint instance"
-docker run -it --net=$NETWORK_NAME --name tendermint$CHAIN_ID$SUFFIX --volume=$TENDERMINT_DATA:/tendermint tendermint
+
