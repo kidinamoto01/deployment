@@ -2,7 +2,7 @@
 
 Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
-## 1) To install Multiverse Demo on Local
+## To install Multiverse Demo on Local
 
 1. Make sure you have docker and docker-compose installed in your computer
 
@@ -10,7 +10,7 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 3. Run: docker-compose up
 
-## 2) To install Multiverse Demo on X Servers
+## To install Multiverse Demo on X Servers
 
 1. For each Amazon EC2 Instance or Digital Ocean Bucket, make sure you have Docker & Docker-Compose Installed
 
