@@ -40,19 +40,26 @@ router.get('/list', function(req, res) {
     } catch (e) {
         console.log("'terraform refresh' failed");
         console.log(e);
-        res.send({ error: "Terraform is not able to perform the requested operation" });
-        return;
+        return res.send({ error: "Terraform is not able to perform the requested operation" });
     }
     //console.log("Terraform configuration refreshed");
 
+    getNodesStatus(nodes, function() {
+        res.send(output);
+    });
+});
+router.get('/list2', function(req, res) {
+    res.send({ nodes: { 1: { IP: "172.31.31.127" } } })
+})
+
+function getNodesStatus(nodes, cb) {
     // Call terraform output to retrieve JSON, process it and return result
     exec("terraform output -json", function(error, stdout, stderr) {
         try {
             console.log("Terraform output", stdout);
             var nodeData = JSON.parse(stdout);
         } catch (e) {
-            res.send({ error: "Unable to process Terraform return" });
-            return;
+            return res.send({ error: "Unable to process Terraform return" });
         }
         var output = { error: null, nodes: {} };
         for (var i = 0; i < nodes.length; i++) {
@@ -70,9 +77,9 @@ router.get('/list', function(req, res) {
                 };
             }
         }
-        res.send(output);
+        cb(output);
     });
-});
+}
 
 /*
  * Create new project
@@ -101,7 +108,7 @@ router.get('/create', function(req, res) {
             //+'  }'
             + '  provisioner "remote-exec" {\n' //
             + '    inline = [\n' //
-            + '        "touch testfile"\n' //
+            //+ '        "touch testfile"\n' //
             + '      "./deployment/docker/init -g=' + git + ' -e=' + app + ' -p=' + project + ' -n=' + node + ' --tendermintPort=46656 --proxyPort=46658 --appPort=46659"\n' //
             + '    ]\n' //
             + '    connection= {\n' //
@@ -133,6 +140,18 @@ router.get('/create', function(req, res) {
         if (err) {
             return console.log(err);
         }
+        return;
+        getNodeStatus(nodes, function(data) {
+            var ips = data.nodes.map(function(o) {
+                return o.IP;
+            }).join(',');
+            console.log("ip list", ips)
+            for (var i in data.nodes) {
+                console.log("Running ssh on:", data.nodes[i]);
+                nodes.
+                exec("ssh ec2-user@" + data.nodes[i].IP + ' -m "init -g=' + git + ' -e=' + app + ' -p=' + project + ' -n=' + node + ' -ips=' + ips + '"');
+            }
+        });
         //console.log("Terraform output", stdout, err, stdout);
     });
 
@@ -191,11 +210,12 @@ router.get('/addPublicKey', function(req, res) {
         key = req.query.key,
         filepath = __dirname + "/genesis/" + project;
 
-    fs.readFile(filepath, function(err, data) {
-        console.log("mm", arguments, filepath);
+    fs.readFile(filepath, 'utf-8', function(err, data) {
         var data = JSON.parse(data);
-        data.keys.push(key);
-        fs.writeFile(filepath, JSON.stringify(data));
+        if (data.keys.indexOf(key) == -1) { // Do not add keys already present
+            data.keys.push(key);
+            fs.writeFile(filepath, JSON.stringify(data));
+        }
         res.send({});
     });
 });
@@ -205,7 +225,6 @@ router.get('/addPublicKey', function(req, res) {
  * Returns completed genesis file
  */
 router.get('/getGenesis', function(req, res) {
-    q
     if (!validate(req, res, { project: { required: true } })) return;
 
     var project = req.query.project,
