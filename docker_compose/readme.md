@@ -4,15 +4,15 @@
 
 1. Make sure you have docker and docker-compose installed in your computer
 
-2. curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_files/docker-compose.yaml
+2. Run: curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_files/docker-compose.yaml
 
-3. docker-compose up
+3. Run: docker-compose up
 
 ## 2) To install Multiverse Demo on X Servers
 
 1. For each Amazon EC2 Instance or Digital Ocean Bucket, make sure you have Docker & Docker-Compose Installed
 
-2. Copy Docker-compose.yml into your servers: curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_files/docker-compose.yaml
+2. Copy Docker-compose.yml into your servers. Run: curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_files/docker-compose.yaml
 
 3. Edit the line with IP_address of your servers separate by a comma
 
