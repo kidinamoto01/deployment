@@ -1,5 +1,7 @@
 # Multiverse Deployment with Docker-Compose
 
+Deploy in one command Tendermint + ABCi Proxy + ABCi App.
+
 ## 1) To install Multiverse Demo on Local
 
 1. Make sure you have docker and docker-compose installed in your computer
