@@ -22,6 +22,9 @@ services:
     - serve-pubkey:/usr/share/nginx/html:ro
   my_tendermint:
     image: multiversecamp/tendermint:latest
+    ports:
+      - "46656:46656"
+      - "46657:46657"
     deploy:
       mode: global
     volumes:
