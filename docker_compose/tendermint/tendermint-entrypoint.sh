@@ -6,10 +6,7 @@ if [ ! -f /tendermint/priv_validator.json ]; then
 
 	tendermint init --home=$TMHOME --log_level "debug" 
 
-	# copy template
-
-	cp -rf /genesis-template.json /tendermint/genesis.json
-
+	
 	## COPY THE PUB KEY INTO THE NGINX SERVER FOLDER
 
 	cat /tendermint/priv_validator.json | jq ".pub_key" > /tendermint/pub_key.json
@@ -17,6 +14,12 @@ if [ ! -f /tendermint/priv_validator.json ]; then
 	cp /tendermint/pub_key.json /pubkey
 	
 	## CREATE THE GENESIS FILE 
+
+	if [ -n "$VALIDATORS" ];
+	then
+		# copy template
+		cp -rf /genesis-template.json /tendermint/genesis.json
+	fi
 	# fill genesis file with validators
 	
 	IFS=',' read -ra VALS_ARR <<< "$VALIDATORS"

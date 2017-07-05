@@ -1,11 +1,11 @@
 version: '3'
 services:
   my_app:
-    image: multiversecamp/sample_app:rc
+    image: multiversecamp/sample_app:latest
     deploy:
       mode: global
   my_proxy:
-    image: multiversecamp/proxy:rc
+    image: multiversecamp/proxy:latest
     deploy:
       mode: global
     environment:
@@ -21,15 +21,15 @@ services:
     volumes:
     - serve-pubkey:/usr/share/nginx/html:ro
   my_tendermint:
-    image: multiversecamp/tendermint:rc
+    image: multiversecamp/tendermint:latest
     deploy:
       mode: global
     volumes:
     - /tmp:/tendermint
     - serve-pubkey:/pubkey
     environment:
-      - VALIDATORS=192.168.99.100,192.168.99.101
-      - SEEDS=192.168.99.100,192.168.99.101
+      - VALIDATORS=
+      - SEEDS=0.0.0.0
       - PROXY_IP=my_proxy
       - DATA_ROOT=/tendermint
     depends_on:
