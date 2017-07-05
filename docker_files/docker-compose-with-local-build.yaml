@@ -20,6 +20,8 @@ services:
     - /tmp:/tendermint
     - serve-pubkey:/pubkey
     environment:
+      - VALIDATORS = "0.0.0.0"
+      - SEEDS = "0.0.0.0"
       - PROXY_IP=my_proxy
       - DATA_ROOT=/tendermint
     depends_on:

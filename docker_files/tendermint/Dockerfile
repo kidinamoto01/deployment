@@ -2,6 +2,11 @@ FROM alpine:3.5
 
 ENV PROXY_IP 0.0.0.0
 
+ENV VALIDATORS=""
+ENV SEEDS=""
+
+
+
 # This is the release of tendermint to pull in.
 ENV TM_VERSION 0.10.0
 ENV TM_SHA256SUM a29852b8d51c00db93c87c3d148fa419a047abd38f32b2507a905805131acc19
