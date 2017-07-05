@@ -26,6 +26,13 @@ Example with three nodes:
 
 ```
 
+3. Debug the blockchain
+
+The script launches a series of screen, you can open them with 
+
+```
+screen -R [tendermint/proxy/app//][CHAIN_ID][NODE]
+```
 
 # Docker naming convention 
 
@@ -37,41 +44,4 @@ Example with three nodes:
 - Intra node : app instance name : `app[CHAIN_ID][NODE]`
 
 
-
-# Usage (deprectade better use tendermintGenerator)
-
-
-
-1. build the docker image (build github program_name)
-
-```
-./build  github.com/multiverseHQ/abci_sample abci_counter
-```
-
-2. create instances
-
-```
-./create NODE1
-./create NODE2
-```
-
-3. enable communication between nodes and launch tendermint instances in screen
-
-```
-./enableCommunication CHAIN_ID NODE1 NODE2
-``` 
-
-4. create genesis file 
-
-```
-./genesis CHAIN_ID NODE1 NODE2 ...
-```
-
-------
-
-> To clean the instance  (if you want to run create again)
-
-./clean NODE1 NODE2 NODE3
-
-
-
+http://ec2-54-172-87-22.compute-1.amazonaws.com:8080/create?nodes=[1]&project=1&git=git@github.com:multiverseHQ/abci_sample.git&app=abci_counter

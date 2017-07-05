@@ -1,0 +1,15 @@
+#!/bin/bash
+
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+volumesPath=
+for M in "${@:2}"
+do
+	volumePath=`docker volume inspect $1$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
+	volumesPath="$volumesPath $volumePath"
+done
+
+volumesPath="${volumesPath:1:${#volumesPath}}"
+
+pub_keys=`$scriptPath/getPubKeys.py $volumesPath`
+echo $pub_keys

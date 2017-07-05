@@ -1,0 +1,54 @@
+#!/usr/bin/python
+
+#!/bin/python
+import argparse
+import subprocess
+import os
+import sys
+from subprocess import Popen, PIPE
+
+parser = argparse.ArgumentParser(prog='PROG')
+
+
+
+
+parser.add_argument("-p", "--project", help="chain unique ID", default="TEST")
+parser.add_argument("-a", "--app", help="name of the executable", action="store_true", default="abci_counter")
+parser.add_argument("-g", "--gitrepo", help="git repository of the app", action="store_true", default="github.com/multiverseHQ/abci_sample")
+parser.add_argument("-n", "--node", help="node", default="test")
+
+
+parser.add_argument("-t", "--tendermintPort", help="exposed tendermint ports", default="46656")
+parser.add_argument("-x", "--proxyPort", help="exposed proxy ports", default="46658")
+parser.add_argument("-w", "--appPort", help="exposed app ports", default="401")
+
+
+
+args = parser.parse_args()
+
+def get_script_path(file):
+   return '{}/lib/{}'.format(os.path.dirname(os.path.realpath(__file__)),file)
+
+def get_current_path(file):
+   return '{}/{}'.format(os.path.dirname(os.path.realpath(__file__)),file)
+
+
+print "---------------- BUILD ---------------"
+build = Popen(
+	[get_script_path('build')]+
+	[args.gitrepo]+
+	[args.app])
+
+build.wait()
+
+
+print "---------------- LAUNCH ---------------"
+enableCommunication = Popen(
+	[get_current_path('tendermintGenerator')]+
+	['--nodesName='+args.node]+
+	['--chainId='+args.project]+
+	['-t='+args.tendermintPort]+
+	['-p='+args.proxyPort]+
+	['-a='+args.appPort])
+
+enableCommunication.wait()

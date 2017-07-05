@@ -1,8 +1,8 @@
 #!/bin/python
-
 import argparse
 import subprocess
 import os
+import sys
 from subprocess import Popen, PIPE
 
 parser = argparse.ArgumentParser(prog='PROG')
@@ -28,6 +28,7 @@ parser_create = subparsers.add_parser('create', help='create a chain')
 parser_create.add_argument("-t", "--tendermintExposedPort", help="exposed tendermint ports", default="46656")
 parser_create.add_argument("-p", "--proxyExposedPort", help="exposed proxy ports", default="46456")
 parser_create.add_argument("-a", "--appExposedPort", help="exposed app ports", default="46256")
+parser_create.add_argument("-x", "--externalConfiguration", help="configuration done distantly", action="store_true")
 
 
 
@@ -53,21 +54,43 @@ if args.module in ['create'] :
       create.wait()
 
    print "---------------- Genesis -----------------"
-   genesis = Popen([get_script_path('genesis')]+[args.chainId]+nodeNames)
-   genesis.wait()
+
+   if args.externalConfiguration:
+      getPubKeys = Popen(
+	[get_script_path('genesisGetPubKeys')]+[args.chainId]+nodeNames,stdout=subprocess.PIPE
+      )
+      pubKeys = ''
+      while True:
+          out = getPubKeys.stdout.read(1)
+          if out == '' and getPubKeys.poll() != None:
+              break
+          if out != '':
+	      pubKeys = pubKeys + out
+      genesis = Popen([get_script_path('genesisSendToTerraform')] + [ args.chainId ] + [ pubKeys ] + [ args.tendermintExposedPort ] + [ args.proxyExposedPort ] + [ args.appExposedPort ] )
+      genesis.wait()
+
+   else:
+      genesis = Popen([get_script_path('genesis')]+[args.chainId]+nodeNames)
+      genesis.wait()
+
+
+   print "---------------- Wait -----------------"
+   sleep = Popen(['sleep','3'])
+   sleep.wait()   
+
+
 
    print "---------------- Start -----------------"
-   print "ready !"
-
    for n,t in map(None,nodeNames, tPorts):
       start = Popen([get_script_path('startTendermint')]+[args.chainId]+[n,t])
       start.wait()
+
 
    print "---------------- Wait -----------------"
    sleep = Popen(['sleep','3'])
    sleep.wait()
 
 
-   print "---------------- enable inter-tendermint communication -----------------"
+   print "---------------- LAUNCH ---------------"
    enableCommunication = Popen([get_script_path('enableCommunication')]+[args.chainId]+nodeNames)
    enableCommunication.wait()

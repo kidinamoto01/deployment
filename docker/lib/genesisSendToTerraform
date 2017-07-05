@@ -1,0 +1,17 @@
+#!/bin/bash
+
+CHAIN_ID=$1
+PUB_KEYS=$2
+TYPE='ed25519'
+
+XAUTH="hQtMsgzwqpKYFwAwHN7leKRSdrzDgK1o"
+
+curl 'url_to_pub_key_addition' \
+-d chain_id="$CHAIN_ID" \
+-d pub_keys_data="$PUB_KEYS" \
+-d tendermintPorts="$3" \
+-d proxyPorts="$4" \
+-d appPorts="$5" \
+-d type="$TYPE" \
+-H "X-Authy-API-Key: $XAUTH"
+
