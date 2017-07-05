@@ -1,0 +1,23 @@
+#!/bin/bash
+
+DOCKER_APP=./Dockerfile.app
+DOCKER_PROXY=./Dockerfile.proxy
+DOCKER_TENDERMINT=./Dockerfile.tendermint
+
+rm $DOCKER_APP
+cp Dockerfile.app.template $DOCKER_APP
+echo "RUN go get -v ${1}/${2}/..." >> $DOCKER_APP
+echo "CMD [\"$2\"]" >> $DOCKER_APP
+
+
+
+# BUILD
+
+#docker build -f $DOCKER_APP -t app:latest .
+#docker build -f $DOCKER_PROXY -t proxy:latest .
+#docker build -f $DOCKER_TENDERMINT -t tendermint:latest .
+
+docker build -f $DOCKER_APP -t app_base:latest .
+docker build -f $DOCKER_PROXY -t proxy_base:latest .
+docker build -f $DOCKER_TENDERMINT -t tendermint:latest .
+

@@ -1,0 +1,4 @@
+FROM golang:1.8
+EXPOSE 46659
+RUN go get -v github.com/multiverseHQ/abci_sample/abci_counter/...
+CMD ["abci_counter"]
