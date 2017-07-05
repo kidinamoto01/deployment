@@ -12,8 +12,7 @@ var app = express();
 
 app.use('/', routes);
 
-// Create a Node.js based http server on port 8080
-var server = require('http').Server(app).listen(80, function(){
+// Create a Node.js based http server on port 8080 
+var server = require('http').Server(app).listen(8080, function(){
   console.log('listening on *:8080');
 });
-
