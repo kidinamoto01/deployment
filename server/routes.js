@@ -28,10 +28,10 @@ router.get('/list', function(req, res) {
             nodes = JSON.parse(data).nodes;
         } catch (e) {
             console.error("Error reading project data", e);
-            return res.status(500).send("Error reading project data:" + e);
+            return res.status(500).send({ error: "Error reading project data:" + e });
         }
     } else {
-        return res.status(500).send("Parameter 'nodes' or 'project' is required.");
+        return res.status(500).send({ error: "Parameter 'nodes' or 'project' is required." });
     }
 
     // Apply terraform output config using refresh
@@ -40,7 +40,7 @@ router.get('/list', function(req, res) {
     } catch (e) {
         console.log("'terraform refresh' failed");
         console.log(e);
-        res.send('{error: "Terraform is not able to perform the requested operation"}');
+        res.send({ error: "Terraform is not able to perform the requested operation" });
         return;
     }
     //console.log("Terraform configuration refreshed");
@@ -51,7 +51,7 @@ router.get('/list', function(req, res) {
             console.log("Terraform output", stdout);
             var nodeData = JSON.parse(stdout);
         } catch (e) {
-            res.send('{error: "Unable to process Terraform return"}');
+            res.send({ error: "Unable to process Terraform return" });
             return;
         }
         var output = { error: null, nodes: {} };
@@ -70,7 +70,7 @@ router.get('/list', function(req, res) {
                 };
             }
         }
-        res.send(JSON.stringify(output));
+        res.send(output);
     });
 });
 
@@ -136,7 +136,7 @@ router.get('/create', function(req, res) {
         //console.log("Terraform output", stdout, err, stdout);
     });
 
-    res.send("Done");
+    res.send({});
 });
 
 /**
@@ -156,10 +156,10 @@ router.get('/remove', function(req, res) {
             nodes = JSON.parse(data).nodes;
         } catch (e) {
             console.error("Error reading project data", e);
-            return res.status(500).send("Error reading project data:" + e);
+            return res.status(500).send({ error: "Error reading project data:" + e });
         }
     } else {
-        return res.status(500).send("Parameter 'nodes' or 'project' is required.");
+        return res.status(500).send({ error: "Parameter 'nodes' or 'project' is required." });
     }
 
     for (var i in nodes) {
@@ -177,7 +177,7 @@ router.get('/remove', function(req, res) {
         //console.log("Terraform output", stdout, err, stdout);
     });
 
-    res.send("DONE");
+    res.send({});
 });
 
 /**
@@ -187,15 +187,16 @@ router.get('/addPublicKey', function(req, res) {
 
     if (!validate(req, res, { project: { required: true }, key: { required: true } })) return;
 
-    var project = req.query.prject,
+    var project = req.query.project,
         key = req.query.key,
         filepath = __dirname + "/genesis/" + project;
 
     fs.readFile(filepath, function(err, data) {
+        console.log("mm", arguments, filepath);
         var data = JSON.parse(data);
         data.keys.push(key);
         fs.writeFile(filepath, JSON.stringify(data));
-        res.send("OK");
+        res.send({});
     });
 });
 
@@ -204,17 +205,21 @@ router.get('/addPublicKey', function(req, res) {
  * Returns completed genesis file
  */
 router.get('/getGenesis', function(req, res) {
-
+    q
     if (!validate(req, res, { project: { required: true } })) return;
 
     var project = req.query.project,
         filepath = __dirname + "/genesis/" + project;
 
     fs.readFile(filepath, function(err, data) {
-        var data = JSON.parse(data);
+        try {
+            var data = JSON.parse(data);
+        } catch (e) {
+            return res.status(500).send({ error: "Unable to retrieve project data" });
+        }
 
         if (data.keys.length < data.nodes.length) {
-            res.send("Not ready yet");
+            res.send({ error: "Not ready yet" });
         } else {
             var ret = {
                 genesis_time: "0001-01-01T00:00:00Z",
@@ -229,7 +234,7 @@ router.get('/getGenesis', function(req, res) {
                     };
                 })
             };
-            res.send(JSON.stringify(ret));
+            res.send(ret);
         }
     });
 });
@@ -243,14 +248,14 @@ function validate(req, res, cfg) {
 
         if (!val) {
             if (cfg[i].required) {
-                res.status(500).send("Parameter '" + i + "' is required.");
+                res.status(500).send({ error: "Parameter '" + i + "' is required." });
                 return false;
             }
         } else if (cfg[i].type == "JSON") {
             try {
                 JSON.parse(val)
             } catch (e) {
-                res.status(500).send("Parameter '" + i + "' is not valid json.");
+                res.status(500).send({ error: "Parameter '" + i + "' is not valid json." });
                 return false;
             }
         }
