@@ -1,11 +1,11 @@
 version: '3'
 services:
   my_app:
-    image: multiversecamp/sample_app:firsttry
+    image: multiversecamp/sample_app:final
     deploy:
       mode: global
   my_proxy:
-    image: multiversecamp/proxy:firsttry
+    image: multiversecamp/proxy:final
     deploy:
       mode: global
     environment:
@@ -21,7 +21,7 @@ services:
     volumes:
     - serve-pubkey:/usr/share/nginx/html:ro
   my_tendermint:
-    image: multiversecamp/tendermint:firsttry
+    image: multiversecamp/tendermint:final
     deploy:
       mode: global
     volumes:
