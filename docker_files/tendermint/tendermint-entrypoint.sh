@@ -1,10 +1,14 @@
 #!/bin/bash
-set -e
+set -x
 
 ## DO TENDERMINT INIT IF PRIV_KEY DOESN"T EXIST /tendermint/priv_validator.json (We need to generate then priv/pub key & genenis.json)
 if [ ! -f /tendermint/priv_validator.json ]; then
 
 	tendermint init --home=$TMHOME --log_level "debug" 
+
+	# copy template
+
+	cp -rf /genesis-template.json /tendermint/genesis.json
 
 	## COPY THE PUB KEY INTO THE NGINX SERVER FOLDER
 
@@ -14,8 +18,9 @@ if [ ! -f /tendermint/priv_validator.json ]; then
 	
 	## CREATE THE GENESIS FILE 
 	# fill genesis file with validators
+	
 	IFS=',' read -ra VALS_ARR <<< "$VALIDATORS"
-	fqdn_suffix=$(hostname -f | sed 's#[^.]*\.\(\)#\1#')
+
 	for v in "${VALS_ARR[@]}"; do
 	  # wait until validator generates priv/pub key pair
 	  set +e
@@ -30,9 +35,9 @@ if [ ! -f /tendermint/priv_validator.json ]; then
 	  set -e
 	
 	  # add validator to genesis file along with its pub_key
-	  curl -s "http://$v/pub_key.json" | jq ". as \$k | {pub_key: \$k, amount: 10, name: \"$v\"}" > pub_validator.json
-	  cat /tendermint/genesis.json | jq ".validators |= .+ [$(cat pub_validator.json)]" > tmpgenesis && mv tmpgenesis /tendermint/genesis.json
-	  rm pub_validator.json
+	  curl -s "http://$v/pub_key.json" | jq ". as \$k | {pub_key: \$k, amount: 10, name: \"$v\"}" > /tendermint/new_pub_validator.json
+	  cat /tendermint/genesis.json | jq ".validators |= .+ [$(cat /tendermint/new_pub_validator.json)]" > /tendermint/tmpgenesis && mv /tendermint/tmpgenesis /tendermint/genesis.json
+	  rm /tendermint/new_pub_validator.json
 	done
 
 fi
@@ -46,3 +51,5 @@ done
 seeds=$(IFS=','; echo "${seeds[*]}")
 
 exec tendermint node --proxy_app=tcp://${PROXY_IP}:46658 --home=$TMHOME --p2p.seeds=$seeds --log_level "debug"
+
+#exec tendermint node --proxy_app=tcp://${PROXY_IP}:46658 --home=$TMHOME --log_level "debug"

@@ -2,8 +2,8 @@ FROM alpine:3.5
 
 ENV PROXY_IP 0.0.0.0
 
-ENV VALIDATORS=""
-ENV SEEDS=""
+ENV VALIDATORS 0.0.0.0
+ENV SEEDS 0.0.0.0
 
 
 
@@ -39,6 +39,14 @@ RUN apk add --no-cache openssl && \
     apk del openssl && \
     rm -f tendermint_${TM_VERSION}_linux_amd64.zip
 
+COPY ./genesis-template.json /
+
+RUN chmod 777 /genesis-template.json
+
+COPY ./tendermint-entrypoint.sh /
+
+RUN chmod 777 /tendermint-entrypoint.sh
+
 # Expose the data directory as a volume since there's mutable state in there
 VOLUME $DATA_ROOT
 
@@ -47,15 +55,4 @@ EXPOSE 46656
 # rpc port
 EXPOSE 46657
 
-COPY ./tendermint-entrypoint.sh /
-
-RUN chmod 777 /tendermint-entrypoint.sh
-
-ENTRYPOINT ["/tendermint-entrypoint.sh"]
-
-# RUN tendermint init --home=$TMHOME --log_level "debug" 
-
-# CMD tendermint node --proxy_app=tcp://${PROXY_IP}:46658 --home=$TMHOME --log_level "debug"
-
-# By default you'll get the dummy app
-# CMD ["node", "--moniker=`hostname`", "--proxy_app=dummy"]
+CMD ["/tendermint-entrypoint.sh"]
