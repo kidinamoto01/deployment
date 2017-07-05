@@ -28,8 +28,8 @@ services:
     - /tmp:/tendermint
     - serve-pubkey:/pubkey
     environment:
-      - VALIDATORS = "192.168.99.100,192.168.99.101"
-      - SEEDS = "192.168.99.100,192.168.99.101"
+      - VALIDATORS=63bb395afc.testurl.ws
+      - SEEDS=63bb395afc.testurl.ws
       - PROXY_IP=my_proxy
       - DATA_ROOT=/tendermint
     depends_on:
