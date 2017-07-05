@@ -1,5 +1,7 @@
 FROM alpine:3.5
 
+ENV PROXY_IP 0.0.0.0
+
 # This is the release of tendermint to pull in.
 ENV TM_VERSION 0.10.0
 ENV TM_SHA256SUM a29852b8d51c00db93c87c3d148fa419a047abd38f32b2507a905805131acc19
@@ -33,13 +35,22 @@ RUN apk add --no-cache openssl && \
     rm -f tendermint_${TM_VERSION}_linux_amd64.zip
 
 # Expose the data directory as a volume since there's mutable state in there
+VOLUME $DATA_ROOT
 
 # p2p port
 EXPOSE 46656
 # rpc port
 EXPOSE 46657
 
+COPY ./tendermint-entrypoint.sh /
 
-# ENTRYPOINT ["tendermint"]
+RUN chmod 777 /tendermint-entrypoint.sh
+
+ENTRYPOINT ["/tendermint-entrypoint.sh"]
+
+# RUN tendermint init --home=$TMHOME --log_level "debug" 
+
+# CMD tendermint node --proxy_app=tcp://${PROXY_IP}:46658 --home=$TMHOME --log_level "debug"
+
 # By default you'll get the dummy app
 # CMD ["node", "--moniker=`hostname`", "--proxy_app=dummy"]

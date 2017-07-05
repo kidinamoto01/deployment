@@ -1,8 +1,9 @@
 FROM golang:1.8
 
 # RUN apk add --no-cache bash
-RUN go get -v github.com/multiverseHQ/abci_proxy/abci_proxy/...
+RUN go get -u -v github.com/multiverseHQ/abci_proxy/abci_proxy/...
 EXPOSE 46658
+
 
 # ENTRYPOINT ["abci_proxy"]
 # CMD ["-proxy=tcp://app:46659"]

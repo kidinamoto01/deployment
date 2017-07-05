@@ -1,0 +1,15 @@
+#!/bin/bash
+
+ps -aux |grep 'SCREEN' | grep -v 'grep' | awk '{print $2}' | xargs kill
+docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker stop 
+docker ps -a | grep -v 'CONTAINER' | awk '{print $1}' | xargs docker rm 
+
+for SUFFIX in "${@:2}"
+do
+	NET_NAME=$1$SUFFIX
+	TENDERMINT_DATA=$1$SUFFIX
+	docker volume rm $TENDERMINT_DATA
+	docker network rm $NET_NAME	
+done
+
+docker network rm $1

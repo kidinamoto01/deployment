@@ -1,0 +1,11 @@
+#!/bin/bash 
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+for M in "${@:2}"
+do
+	$scriptPath/createOne $1 $M
+done
+
+
+$scriptPath/enableCommunication "${@:1}"
+

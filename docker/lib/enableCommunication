@@ -1,0 +1,20 @@
+#!/bin/bash
+
+docker network create --driver=bridge $1
+
+# echo $*
+# Goal : connect the different network to the different tendermint$CHAIN_ID$NODE instance
+
+for M in "${@:2}"
+do
+	echo connect general $1 network to tendermint node $TENDERMINT_NAME$M
+	docker network connect $1 tendermint$1$M
+done
+ 
+for M in "${@:2}"
+do
+	cmdTendermint="docker start -a -i tendermint$1$M"
+	screen -dmS tendermint$1$M bash -c "$cmdTendermint; exec bash"
+done
+
+
