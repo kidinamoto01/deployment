@@ -6,8 +6,10 @@ TENDERMINT_PORT=$3
 
 NETWORK_NAME=$CHAIN_ID$SUFFIX
 TENDERMINT_DATA=${CHAIN_ID}$SUFFIX
+VOLUME_PATH=/home/ec2-user/deployment/docker/volumes/$TENDERMINT_DATA
+
 
 echo "Launching tendermint instance"
-cmdTendermint="docker run -it -p $TENDERMINT_PORT:46656 --net=$NETWORK_NAME --name=tendermint$CHAIN_ID$SUFFIX --volume=$TENDERMINT_DATA:/tendermint tendermint tendermint --home=/tendermint node"
+cmdTendermint="docker run -it -p $TENDERMINT_PORT:46656 --net=$NETWORK_NAME --name=tendermint$CHAIN_ID$SUFFIX --volume=$VOLUME_PATH:/tendermint tendermint tendermint --home=/tendermint node"
 echo $cmdTendermint
 screen -dmS tendermint$CHAIN_ID$SUFFIX bash -c "$cmdTendermint"

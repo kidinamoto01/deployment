@@ -15,13 +15,16 @@ TENDERMINT_DATA=${CHAIN_ID}$SUFFIX
 # CREATE NETWORK, VOLUME AND IMAGES
 
 docker network create $NETWORK_NAME
-docker volume create --name $TENDERMINT_DATA
 
+#docker volume create --name $TENDERMINT_DATA
+VOLUME_PATH=/home/ec2-user/deployment/docker/volumes/$TENDERMINT_DATA
+mkdir  $VOLUME_PATH
 
 echo "Launching app"
 cmdApp="docker run -p $APP_PORT:$APP_PORT -it --name app$CHAIN_ID$SUFFIX --net=$NETWORK_NAME app; exec bash"
 #echo $cmdApp
 screen -dmS app$CHAIN_ID$SUFFIX bash -c "$cmdApp"
+sleep 1
 
 echo "Launching proxy"
 cmdProxy="docker run -p $PROXY_PORT:46659 -it --name proxy$CHAIN_ID$SUFFIX --net=$NETWORK_NAME proxy abci_proxy -proxy=tcp://app$CHAIN_ID$SUFFIX:46659 -v; exec bash"
@@ -29,5 +32,9 @@ cmdProxy="docker run -p $PROXY_PORT:46659 -it --name proxy$CHAIN_ID$SUFFIX --net
 screen -dmS proxy$CHAIN_ID$SUFFIX bash -c "$cmdProxy"
 
 echo "Init tendermint"
-docker run -it --rm --net=$NETWORK_NAME --volume=$TENDERMINT_DATA:/tendermint tendermint tendermint --home=/tendermint init 
+docker run -it --rm --net=$NETWORK_NAME --volume=$VOLUME_PATH:/tendermint tendermint tendermint --home=/tendermint init 
 
+
+# $VOLUME_PATH/genesis.json
+#touch $VOLUME_PATH/priv_validator.json
+sudo chown -R ec2-user:ec2-user $VOLUME_PATH

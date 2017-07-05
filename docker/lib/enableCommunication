@@ -4,5 +4,6 @@ docker network create --driver=bridge $1
 for M in "${@:2}"
 do
 	echo connect general $1 network to tendermint node $TENDERMINT_NAME$M
+	echo "docker network connect $1 tendermint$1$M"
 	docker network connect $1 tendermint$1$M
 done

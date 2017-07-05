@@ -8,6 +8,12 @@
 
 ## Examples 
 
+0. Build the docker images
+
+```
+./build  github.com/multiverseHQ/abci_sample abci_counter
+```
+
 1. Create a blockchain 
 
 Example with three nodes:

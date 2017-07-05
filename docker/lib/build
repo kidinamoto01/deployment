@@ -11,9 +11,8 @@ echo "CMD [\"$2\"]" >> $DOCKER_APP
 
 
 
-# BUILD 
+# BUILD
 
 docker build -f $DOCKER_APP -t app:latest .
 docker build -f $DOCKER_PROXY -t proxy:latest .
-docker build -f $DOCKER_TENDERMINT -t tendermint:latest .
 

@@ -13,8 +13,8 @@ parser = argparse.ArgumentParser(prog='PROG')
 
 
 parser.add_argument("-p", "--project", help="chain unique ID", default="TEST")
-parser.add_argument("-a", "--app", help="name of the executable", action="store_true", default="abci_counter")
-parser.add_argument("-g", "--gitrepo", help="git repository of the app", action="store_true", default="github.com/multiverseHQ/abci_sample")
+parser.add_argument("-a", "--app", help="name of the executable", default="abci_counter")
+parser.add_argument("-g", "--gitrepo", help="git repository of the app", default="github.com/multiverseHQ/abci_sample")
 parser.add_argument("-n", "--node", help="node", default="test")
 
 
@@ -43,12 +43,23 @@ build.wait()
 
 
 print "---------------- LAUNCH ---------------"
-enableCommunication = Popen(
+print(
 	[get_current_path('tendermintGenerator')]+
 	['--nodesName='+args.node]+
 	['--chainId='+args.project]+
 	['-t='+args.tendermintPort]+
 	['-p='+args.proxyPort]+
 	['-a='+args.appPort])
+
+enableCommunication = Popen(
+	[get_current_path('tendermintGenerator')]+
+	['--nodesName='+args.node]+
+	['--chainId='+args.project]+
+	['create']+
+	['-t='+args.tendermintPort]+
+	['-p='+args.proxyPort]+
+	['-a='+args.appPort])
+
+
 
 enableCommunication.wait()
