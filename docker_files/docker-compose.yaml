@@ -1,7 +1,7 @@
 version: '3'
 services:
   my_app:
-    image: multiversecamp/sample:rc
+    image: multiversecamp/sample_app:rc
     deploy:
       mode: global
   my_proxy:
