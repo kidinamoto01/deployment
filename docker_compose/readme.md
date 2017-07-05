@@ -14,10 +14,10 @@
 
 2. Copy Docker-compose.yml into your servers: curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_files/docker-compose.yaml
 
-3. Edit the line with IP_address of your servers. 
+3. Edit the line with IP_address of your servers separate by a comma
 
 - SEEDS=192.168.0.2,192.168.0.3
-- VALIDATORS= 192.168.0.2,192.168.0.3
+- VALIDATORS=192.168.0.2,192.168.0.3
 
 4. Launch each Tendermint node + ABCi app 
 
