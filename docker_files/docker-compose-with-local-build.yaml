@@ -1,7 +1,7 @@
 version: '3'
 services:
   my_app:
-    image: multiversecamp/sample_app:firsttry
+    build: ./app/.
   my_proxy:
     build: ./proxy/.
     environment:
@@ -9,13 +9,13 @@ services:
     depends_on:
       - "my_app"
   my_nginx:
-    image: multiversecamp/proxy:firsttry
+    image: nginx
     ports:
         - "80:80"
     volumes:
     - serve-pubkey:/usr/share/nginx/html:ro
   my_tendermint:
-    image: multiversecamp/tendermint:firsttry
+    build: ./tendermint/.
     volumes:
     - /tmp:/tendermint
     - serve-pubkey:/pubkey
