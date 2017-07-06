@@ -3,7 +3,7 @@ FROM proxy_base
 # RUN apk add --no-cache bash
 RUN go get -u -v github.com/multiverseHQ/abci_proxy/abci_proxy/...
 EXPOSE 46658
-
+EXPOSE 46660
 
 # ENTRYPOINT ["abci_proxy"]
 # CMD ["-proxy=tcp://app:46659"]

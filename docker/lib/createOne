@@ -27,13 +27,17 @@ screen -dmS app$CHAIN_ID$SUFFIX bash -c "$cmdApp"
 sleep 1
 
 echo "Launching proxy"
-cmdProxy="docker run -p $PROXY_PORT:46659 -it --name proxy$CHAIN_ID$SUFFIX --net=$NETWORK_NAME proxy abci_proxy -proxy=tcp://app$CHAIN_ID$SUFFIX:46659 -v; exec bash"
+cmdProxy="docker run -p 46660:46660 -p $PROXY_PORT:46659 -it --name proxy$CHAIN_ID$SUFFIX --net=$NETWORK_NAME proxy abci_proxy -proxy=tcp://app$CHAIN_ID$SUFFIX:46659 -v; exec bash"
 #echo $cmdProxy
 screen -dmS proxy$CHAIN_ID$SUFFIX bash -c "$cmdProxy"
 
 echo "Init tendermint"
 docker run -it --rm --net=$NETWORK_NAME --volume=$VOLUME_PATH:/tendermint tendermint tendermint --home=/tendermint init 
 
+
+echo "---- volumes "
+echo "-------------"
+ls $VOLUME_PATH/
 
 # $VOLUME_PATH/genesis.json
 #touch $VOLUME_PATH/priv_validator.json

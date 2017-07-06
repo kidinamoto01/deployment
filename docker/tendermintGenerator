@@ -53,6 +53,10 @@ if args.module in ['create'] :
       create = Popen([get_script_path('createOne')]+[args.chainId]+[n,p,a])
       create.wait()
 
+   sleep = Popen(['sleep','3'])
+   sleep.wait()   
+
+
    print "---------------- Genesis -----------------"
 
    if args.externalConfiguration:

@@ -1,3 +1,9 @@
+SOME THINGS HARDCODED FOR HACKATHON
+
+-> folder name of docker volumes
+-> exposed port only works for one instance per node
+-> no deletion of volumes when launching debug (easier to not mess up genesis during testing)
+
 # Usage tendermintGenerator
 
 

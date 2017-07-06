@@ -10,7 +10,7 @@ do
 	TENDERMINT_DATA=$1$SUFFIX
 	# docker volume rm $TENDERMINT_DATA
 	VOLUME_PATH=/home/ec2-user/deployment/docker/volumes/$TENDERMINT_DATA
-	sudo rm -Rf $VOLUME_PATH
+	#sudo rm -Rf $VOLUME_PATH
 	docker network rm $NET_NAME
 done
 
