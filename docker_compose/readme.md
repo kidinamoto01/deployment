@@ -1,4 +1,4 @@
-# Deploy your ABCi app in 1 click with Docker-Compose
+# Deploy your ABCi app in 1 click with Docker-Compose (Produced by the Multiverse Team)
 
 Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
