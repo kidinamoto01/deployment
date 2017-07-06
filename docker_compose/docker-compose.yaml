@@ -1,14 +1,14 @@
 version: '3'
 services:
   my_app:
-    image: multiversecamp/sample_app:latest
+    build: ./app/.
     environment:
       - GITHUB_REPO=github.com/multiverseHQ/abci_sample/abci_counter/...
       - COMMAND=abci_counter
     deploy:
       mode: global
   my_proxy:
-    image: multiversecamp/proxy:latest
+    build: ./proxy/.
     deploy:
       mode: global
     environment:
@@ -24,7 +24,7 @@ services:
     volumes:
     - serve-pubkey:/usr/share/nginx/html:ro
   my_tendermint:
-    image: multiversecamp/tendermint:latest
+    build: ./tendermint/.
     ports:
       - "46656:46656"
       - "46657:46657"
