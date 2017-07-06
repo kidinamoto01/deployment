@@ -2,6 +2,9 @@ version: '3'
 services:
   my_app:
     build: ./app/.
+    environment:
+      - GITHUB_REPO=github.com/multiverseHQ/abci_sample/abci_counter/...
+      - COMMAND=abci_counter
     deploy:
       mode: global
   my_proxy:

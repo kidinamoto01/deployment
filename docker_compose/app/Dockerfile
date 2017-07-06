@@ -1,10 +1,9 @@
 FROM golang:1.8
 
+ENV GITHUB_REPO github.com/multiverseHQ/abci_sample/abci_counter/...
+
+ENV COMMAND abci_counter
+
 EXPOSE 46659
 
-RUN go get -v github.com/multiverseHQ/abci_sample/abci_counter/...
-
-CMD abci_counter
-
-#docker build -t monday_app .
-#docker run -it  monday_app
+CMD ["/app-entrypoint.sh"]
