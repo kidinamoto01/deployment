@@ -15,7 +15,7 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 4. Run: docker-compose up
 
-## To install Multiverse Demo on X Servers
+## To deploy your ABCi app on X Servers
 
 1. For each Amazon EC2 Instance or Digital Ocean Bucket, make sure you have Docker & Docker-Compose Installed
 
