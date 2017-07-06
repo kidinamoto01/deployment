@@ -1,11 +1,14 @@
 version: '3'
 services:
   my_app:
-    image: multiversecamp/sample:final
+    image: multiversecamp/sample_app:latest
+    environment:
+      - GITHUB_REPO=github.com/multiverseHQ/abci_sample/abci_counter/...
+      - COMMAND=abci_counter
     deploy:
       mode: global
   my_proxy:
-    image: multiversecamp/proxy:final
+    image: multiversecamp/proxy:latest
     deploy:
       mode: global
     environment:
@@ -21,15 +24,18 @@ services:
     volumes:
     - serve-pubkey:/usr/share/nginx/html:ro
   my_tendermint:
-    image: multiversecamp/tendermint:final
+    image: multiversecamp/tendermint:latest
+    ports:
+      - "46656:46656"
+      - "46657:46657"
     deploy:
       mode: global
     volumes:
     - /tmp:/tendermint
     - serve-pubkey:/pubkey
     environment:
-      - VALIDATORS = "192.168.99.100,192.168.99.101"
-      - SEEDS = "192.168.99.100,192.168.99.101"
+      - VALIDATORS=
+      - SEEDS=0.0.0.0
       - PROXY_IP=my_proxy
       - DATA_ROOT=/tendermint
     depends_on:
