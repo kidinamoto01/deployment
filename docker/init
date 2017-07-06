@@ -69,7 +69,7 @@ enableCommunication.wait()
 ips = args.ips.split(",")
 ports = args.tendermintPort.split(",")
 nodeNames = args.node.split(",")
-p2pseeds = ",".join(["{}:{}".format(ip, port) for ip,port in map(ports[1],ips,ports])
+p2pseeds = ",".join(["{}:{}".format(ip, ports[0]) for ip in ips])
 
 print "--- replace p2p seeds in config.toml ---"
 for n in map(None,nodeNames):
