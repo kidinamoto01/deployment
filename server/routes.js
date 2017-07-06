@@ -25,8 +25,11 @@ function getPath(project) {
     return DATAPATH + "/" + project;
 }
 
+function projectExists(project) {
+    return fs.existsSync(getPath(project));
+}
 /**
- * Return node status retrived from terraform for a gien project
+ * Return nodes status retrieved from terraform for a given project
  */
 function getNodesStatus(project, cb) {
     // Call terraform output to retrieve JSON, process it and return result
@@ -66,10 +69,7 @@ router.get('/create', function(req, res) {
         app = req.query.app,
         path = getPath(project);
 
-    if (fs.existsSync(path)) {
-        res.status(500).send("Project already exists");
-        return;
-    }
+    if (projectExists(project)) return res.status(500).send({ error: "Project already exists" });
 
     fs.mkdirSync(path);
     fs.writeFile(path + "/config", JSON.stringify({ count: nodes.length, keys: [], nodes: nodes }));
@@ -147,6 +147,8 @@ router.get('/list', function(req, res) {
 
     if (!validate(req, res, { project: { required: true } })) return;
 
+    if (!projectExists(project)) return res.status(500).send({ error: "Project does not exist" });
+
     // Apply terraform output config using refresh
     try {
         var stdout = execSync("cd " + getPath(req.query.project) + "; terraform refresh");
@@ -204,6 +206,8 @@ router.get('/remove', function(req, res) {
 
     var project = req.query.project;
 
+    if (!projectExists(project)) return res.status(500).send({ error: "Project does not exist" });
+
     if (req.query.nodes) {
         var nodes = JSON.parse(req.query.nodes);
 
@@ -245,6 +249,8 @@ router.get('/addPublicKey', function(req, res) {
         key = req.query.key,
         data;
 
+    if (!projectExists(project)) return res.status(500).send({ error: "Project does not exist" });
+
     try {
         data = getConfig(project);
     } catch (e) {
@@ -267,6 +273,9 @@ router.get('/getGenesis', function(req, res) {
 
     var project = req.query.project,
         data;
+
+    if (!projectExists(project)) return res.status(500).send({ error: "Project does not exist" });
+
 
     try {
         data = getConfig(project);
@@ -317,11 +326,12 @@ function validate(req, res, cfg) {
     }
     return true;
 }
+
 /**
  * Utils
  */
 function object_values(o) {
-    var ret = []
+    var ret = [];
     for (var i in o) {
         ret.push(o[i]);
     }
