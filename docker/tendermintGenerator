@@ -69,28 +69,34 @@ if args.module in ['create'] :
       genesis = Popen([get_script_path('genesisSendToTerraform')] + [ args.chainId ] + [ pubKeys ] + [ args.tendermintExposedPort ] + [ args.proxyExposedPort ] + [ args.appExposedPort ] )
       genesis.wait()
 
+      print "--- wait4genesis from server ---"
+      if args.externalConfiguration:
+          wait4genesis = Popen([get_script_path('waitForGenesisReady')] + [ args.chainId ] + [ nodeNames[0] ] )
+          wait4genesis.wait()
+      print "--- replace proxy app in config.toml ---"
+      genesisReplaceProxyApp = Popen([get_script_path('genesisReplaceProxyApp')]+[args.chainId]+nodeNames)
+      genesisReplaceProxyApp.wait()
+
+      sleep = Popen(['sleep','3'])
+      sleep.wait()   
+
+
+
    else:
       genesis = Popen([get_script_path('genesis')]+[args.chainId]+nodeNames)
       genesis.wait()
+      print "---------------- Start -----------------"
+      for n,t in map(None,nodeNames, tPorts):
+          start = Popen([get_script_path('startTendermint')]+[args.chainId]+[n,t])
+          start.wait()
+
+      print "---------------- Wait -----------------"
+      sleep = Popen(['sleep','3'])
+      sleep.wait()
+
+      print "---------------- LAUNCH ---------------"
+      enableCommunication = Popen([get_script_path('enableCommunication')]+[args.chainId]+nodeNames)
+      enableCommunication.wait()
 
 
-   print "---------------- Wait -----------------"
-   sleep = Popen(['sleep','3'])
-   sleep.wait()   
 
-
-
-   print "---------------- Start -----------------"
-   for n,t in map(None,nodeNames, tPorts):
-      start = Popen([get_script_path('startTendermint')]+[args.chainId]+[n,t])
-      start.wait()
-
-
-   print "---------------- Wait -----------------"
-   sleep = Popen(['sleep','3'])
-   sleep.wait()
-
-
-   print "---------------- LAUNCH ---------------"
-   enableCommunication = Popen([get_script_path('enableCommunication')]+[args.chainId]+nodeNames)
-   enableCommunication.wait()

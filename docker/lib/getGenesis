@@ -1,0 +1,23 @@
+#!/usr/bin/python
+
+import requests
+import sys 
+
+sys.argv.pop(0)
+
+path = "/home/ec2-user/deployment/docker"
+
+url = "{}/getGenesis?project={}".format('http://ec2-54-172-87-22.compute-1.amazonaws.com:8080', sys.argv[0])
+#print url
+response = requests.get(url)
+#print(response.content)
+
+
+if('error' in response.content):
+     print('error')
+else:
+     print('ok')
+     #print(response.content)
+     f = open("{}/volumes/{}{}/genesis.json".format(path, sys.argv[0], sys.argv[1] ),"w") 
+     f.write(response.content)
+     f.close()

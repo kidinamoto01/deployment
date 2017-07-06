@@ -16,6 +16,7 @@ parser.add_argument("-p", "--project", help="chain unique ID", default="TEST")
 parser.add_argument("-a", "--app", help="name of the executable", default="abci_counter")
 parser.add_argument("-g", "--gitrepo", help="git repository of the app", default="github.com/multiverseHQ/abci_sample")
 parser.add_argument("-n", "--node", help="node", default="test")
+parser.add_argument("-i", "--ips", help="ips", default="127.0.0.1")
 
 
 parser.add_argument("-t", "--tendermintPort", help="exposed tendermint ports", default="46656")
@@ -25,6 +26,8 @@ parser.add_argument("-w", "--appPort", help="exposed app ports", default="401")
 
 
 args = parser.parse_args()
+
+
 
 def get_script_path(file):
    return '{}/lib/{}'.format(os.path.dirname(os.path.realpath(__file__)),file)
@@ -43,13 +46,13 @@ build.wait()
 
 
 print "---------------- LAUNCH ---------------"
-print(
-	[get_current_path('tendermintGenerator')]+
-	['--nodesName='+args.node]+
-	['--chainId='+args.project]+
-	['-t='+args.tendermintPort]+
-	['-p='+args.proxyPort]+
-	['-a='+args.appPort])
+#print(
+#	[get_current_path('tendermintGenerator')]+
+#	['--nodesName='+args.node]+
+#	['--chainId='+args.project]+
+#	['-t='+args.tendermintPort]+
+#	['-p='+args.proxyPort]+
+#	['-a='+args.appPort])
 
 enableCommunication = Popen(
 	[get_current_path('tendermintGenerator')]+
@@ -58,8 +61,30 @@ enableCommunication = Popen(
 	['create']+
 	['-t='+args.tendermintPort]+
 	['-p='+args.proxyPort]+
-	['-a='+args.appPort])
+	['-a='+args.appPort]+
+	['-x'])
+enableCommunication.wait()
 
 
+ips = args.ips.split(",")
+port = args.tendermintPort
+nodeNames = args.node.split(",")
+p2pseeds = ",".join(["{}:{}".format(ip, port) for ip in ips])
 
+print "--- replace p2p seeds in config.toml ---"
+for n in map(None,nodeNames):
+    genesisReplaceP2PSeeds = Popen([get_script_path('genesisReplaceP2Pseeds')]+[args.project]+[n]+[p2pseeds])
+    genesisReplaceP2PSeeds.wait()
+
+
+print "---------------- Start -----------------"
+for n,t in map(None,nodeNames, ports):
+    start = Popen([get_script_path('startTendermint')]+[args.project]+[n,t])
+    start.wait()
+print "---------------- Wait -----------------"
+sleep = Popen(['sleep','3'])
+sleep.wait()
+
+print "---------------- LAUNCH ---------------"
+enableCommunication = Popen([get_script_path('enableCommunication')]+[args.project]+nodeNames)
 enableCommunication.wait()

@@ -2,10 +2,13 @@
 
 scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+
+
 volumesPath=
 for M in "${@:2}"
 do
-	volumePath=`docker volume inspect $1$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
+	volumePath="/home/ec2-user/deployment/docker/volumes/$1$M"
+	#volumePath=`docker volume inspect $1$M | grep 'Mountpoint' | awk -F ':' '{print $2}' | awk -F '"' '{print $2}'`
 	volumesPath="$volumesPath $volumePath"
 done
 

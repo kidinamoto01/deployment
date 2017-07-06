@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+done=0
+while : ; do
+  gen=`./lib/getGenesis $1 $2`
+  echo $gen
+  if [[ $gen = "ok" ]]; then
+      break
+  fi
+  echo "wait a bit more"
+  sleep 1
+done

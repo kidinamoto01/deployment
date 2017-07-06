@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TENDERMINT_DATA=$1$2
+p2pseeds=$3
+volumePath=/home/ec2-user/deployment/docker/volumes/$TENDERMINT_DATA
+
+find $volumePath/config.toml | xargs perl -pi -e "s/seeds.*/seeds = \"$p2pseeds\"/g"
+
+

@@ -6,12 +6,12 @@ TYPE='ed25519'
 
 XAUTH="hQtMsgzwqpKYFwAwHN7leKRSdrzDgK1o"
 
-curl 'url_to_pub_key_addition' \
--d chain_id="$CHAIN_ID" \
--d pub_keys_data="$PUB_KEYS" \
--d tendermintPorts="$3" \
--d proxyPorts="$4" \
--d appPorts="$5" \
--d type="$TYPE" \
--H "X-Authy-API-Key: $XAUTH"
+url="http://ec2-54-172-87-22.compute-1.amazonaws.com:8080"
+
+full_url="$url/addPublicKey?project=$CHAIN_ID&key=$PUB_KEYS"
+
+URL=${full_url%$'\r'}
+
+curl $URL
+# -H "X-Authy-API-Key: $XAUTH")
 
