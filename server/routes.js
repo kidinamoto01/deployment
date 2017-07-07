@@ -1,13 +1,16 @@
 var express = require('express');
 var router = express.Router();
-
 var exec = require('child_process').exec;
 var execSync = require('child_process').execSync;
 var fs = require('fs');
+var http = require("http");
+var https = require("https");
 
-var TERRAFORMAPPLY_CMD = 'nohup terraform apply > tera.log';
-var TERRAFORMAMI = "ami-f77f7be1";
+var TERRAFORMAPPLY_CMD = 'terraform apply > tera.log';
+var TERRAFORMAMI = "ami-5ec8cf48";
 var DATAPATH = __dirname + "/data";
+
+//do catch all getnodesstatus
 
 
 /**
@@ -33,14 +36,16 @@ function projectExists(project) {
  */
 function getNodesStatus(project, cb) {
     // Call terraform output to retrieve JSON, process it and return result
-    exec("cd " + getPath(project) + ";terraform output -json", function(error, stdout, stderr) {
-        var output = { nodes: {} },
-            nodeData;
+
+    console.log("getNodesStatus():", "cd " + getPath(project) + "; terraform output -json");
+    exec("cd " + getPath(project) + "; terraform output -json", function(error, stdout, stderr) {
+        var nodeData, output = { nodes: {} };
+
         try {
-            //console.log("Terraform output", stdout);
+            console.log("Terraform output", stdout);
             nodeData = JSON.parse(stdout);
         } catch (e) {
-            console.error("Unable to process Terraform return");
+            console.log("Unable to process Terraform return", e);
             //res.send({ error: "Unable to process Terraform return" });
             output.error = "Unable to process Terraform return";
             cb(output);
@@ -67,13 +72,14 @@ router.get('/create', function(req, res) {
         project = req.query.project,
         git = req.query.git,
         app = req.query.app,
-        path = getPath(project);
+        path = getPath(project),
+        projExists = projectExists(project);
 
-    if (projectExists(project)) return res.status(500).send({ error: "Project already exists" });
-
-    fs.mkdirSync(path);
-    fs.writeFile(path + "/config", JSON.stringify({ count: nodes.length, keys: [], nodes: nodes }));
-    execSync("cp " + DATAPATH + "/aws_* " + path);
+    if (!projExists) {
+        fs.mkdirSync(path);
+        fs.writeFile(path + "/config", JSON.stringify({ count: nodes.length, keys: [], nodes: nodes }));
+        execSync("cp " + DATAPATH + "/aws_* " + path);
+    }
 
     for (var i = 0; i < nodes.length; i++) {
         var node = 'node' + nodes[i];
@@ -107,28 +113,30 @@ router.get('/create', function(req, res) {
         var filepath = getPath(project) + "/" + node + ".tf";
         fs.writeFile(filepath, cfg, function(err) {
             if (err) {
-                return console.error(err);
+                return console.log(err);
             }
         });
     }
 
     exec("cd " + getPath(project) + ";" + TERRAFORMAPPLY_CMD, function(err, stdout, stderr) {
         if (err) {
-            return console.error(err);
+            return console.log("Error applying terraform:120", err);
+            //return console.log(err);
         }
 
         getNodesStatus(project, function(data) {
             var ips = object_values(data.nodes).map(function(o) {
                 return o.ip;
             }).join(',');
+            for (var i in nodes) {
+                var id = nodes[i],
+                    node = data.nodes[id];
 
-            for (var i in data.nodes) {
-                var node = data.nodes[i];
-                var cmd = 'cd deployment/docker;./init -g=' + git + ' -a=' + app + ' -p=' + project + ' -n=' + i + ' -i=' + ips + " --tendermintPort=46656 --proxyPort=46658 --appPort=46659";
+                var cmd = 'cd deployment/docker;sleep 20 && ./init -g=' + git + ' -a=' + app + ' -p=' + project + ' -n=' + id + ' -i=' + ips + " --tendermintPort=46656 --proxyPort=46658 --appPort=46659 > init.log";
                 //var cmd = "touch testfile";
                 console.log("Running ssh on:", node, "cmd: ", cmd);
                 exec("ssh -oStrictHostKeyChecking=no ec2-user@" + node.ip + ' "' + cmd + '"', function(e, stdout, stderr) {
-                    if (e) console.error(e, stdout, stderr);
+                    if (e) console.log("Error running ssh", e);
                 });
             }
         });
@@ -147,19 +155,85 @@ router.get('/list', function(req, res) {
 
     if (!validate(req, res, { project: { required: true } })) return;
 
-    if (!projectExists(project)) return res.status(500).send({ error: "Project does not exist" });
+    if (!projectExists(req.query.project)) return res.status(500).send({ error: "Project does not exist" });
 
     // Apply terraform output config using refresh
     try {
         var stdout = execSync("cd " + getPath(req.query.project) + "; terraform refresh");
     } catch (e) {
-        console.error("'terraform refresh' failed", e);
+        console.log("'terraform refresh' failed", e);
         return res.send({ error: "Terraform is not able to perform the requested operation" });
     }
     //console.log("Terraform configuration refreshed");
 
-    getNodesStatus(req.query.project, function(output) {
-        res.send(output);
+    getNodesStatus(req.query.project, function(data) {
+        res.send(data);
+    });
+});
+
+
+/**
+ * List state  for given nodes
+ */
+router.get('/listValidators', function(req, res) {
+    // Get nodes, init cfg var
+    console.log("Entering /listValidators route");
+
+    if (!validate(req, res, { project: { required: true } })) return;
+
+    if (!projectExists(req.query.project)) return res.status(500).send({ error: "Project does not exist" });
+
+    // Apply terraform output config using refresh
+    try {
+        var stdout = execSync("cd " + getPath(req.query.project) + "; terraform refresh");
+    } catch (e) {
+        console.log("'terraform refresh' failed", e);
+        return res.send({ error: "Terraform is not able to perform the requested operation" });
+    }
+    //console.log("Terraform configuration refreshed");
+
+    getNodesStatus(req.query.project, function(data) {
+        //console.log("got nodes status", data);
+        var validators, counter = 1,
+            onRequest = function() {
+                counter--;
+                if (counter === 0) {
+
+                    for (var i in data.nodes) {
+                        var n = data.nodes[i]
+                        var v = object_find(validators, function(v) {
+                            return n.pub_key && v.pub_key.data === n.pub_key.data;
+                        });
+
+                        if (v) n.voting_power = v.voting_power;
+                    }
+                    res.send(data);
+                    counter--;
+                    if (counter === 0) {
+                        res.send(data);
+                    }
+                }
+            };
+        // console.log("data.nodes,", data.nodes);
+        getJSON({ host: object_values(data.nodes)[0].ip, port: 46657, path: '/validators', method: 'GET' },
+            function(status, data) {
+                validators = data.result.validators;
+                //console.log("validators", validators);
+                onRequest();
+            }, onRequest);
+
+        for (var i in data.nodes) {
+            var node = data.nodes[i];
+            counter++;
+            getJSON({ host: node.ip, port: 46657, path: '/status', method: 'GET' },
+                function(node, status, data) {
+                    node.latest_block_height = data.result.latest_block_height;
+                    node.latest_block_time = data.result.latest_block_time;
+                    node.latest_block_hash = data.result.latest_block_hash;
+                    node.pub_key = data.result.pub_key;
+                    onRequest();
+                }.bind(null, node), onRequest);
+        }
     });
 });
 
@@ -188,7 +262,7 @@ router.get("/test", function(req, res) {
             console.log("Running ssh on:", node, "cmd: ", cmd);
             //exec("ssh ec2-user@" + data.nodes[i].IP + '  "init -g=' + git + ' -e=' + app + ' -p=' + project + ' -n=' + node + ' -ips=' + ips + '"');
             exec("ssh -oStrictHostKeyChecking=no ec2-user@" + data.nodes[i].ip + ' "' + cmd + '"', function(e, stdout, stderr) {
-                if (e) console.error(e, stdout, stderr);
+                if (e) console.log("Error running ssh", e);
             });
             // exec("ssh ec2-user@" + data.nodes[i].IP + ' -m ' //
             //     + '"./deployment/docker/init -g=' + git + ' -a=' + app + ' -p=' + project + ' -n=' + node + ' --tendermintPort=46656 --proxyPort=46658 --appPort=46659 -i=' + ips + '"')
@@ -215,20 +289,20 @@ router.get('/remove', function(req, res) {
             try {
                 execSync("unlink " + getPath(project) + "/node" + i + ".tf");
             } catch (e) {
-                console.error('Unlink error: ', e);
+                console.log('Unlink error: ', e);
             }
         }
     } else {
         try {
             execSync("unlink " + getPath(project) + "/node*.tf");
         } catch (e) {
-            console.error('Unlink error: ', e);
+            console.log('Unlink error: ', e);
         }
     }
 
     exec("cd " + getPath(project) + ";terraform apply", function(err, stdout, stderr) {
         if (err) {
-            return console.error("Remove apply error:", err);
+            return console.log("Remove apply error:", err);
         }
         console.log("Deleting folder");
         exec("rm -rf " + getPath(project));
@@ -242,6 +316,7 @@ router.get('/remove', function(req, res) {
  * Add a public key to the cluster of public keys
  */
 router.get('/addPublicKey', function(req, res) {
+    console.log("Entering addPublicKey")
 
     if (!validate(req, res, { project: { required: true }, key: { required: true } })) return;
 
@@ -254,10 +329,11 @@ router.get('/addPublicKey', function(req, res) {
     try {
         data = getConfig(project);
     } catch (e) {
+        console.log("error retrieving project data.", e);
         return res.status(500).send({ error: "Unable to retrieve project data" });
     }
 
-    if (data.keys.indexOf(key) == -1) { // Do not add keys already present
+    if (data.keys.indexOf(key) == -1 && data.keys.length < data.nodes.length) { // Do not add keys already present
         data.keys.push(key);
         fs.writeFile(getPath(project) + "/config", JSON.stringify(data));
     }
@@ -275,7 +351,6 @@ router.get('/getGenesis', function(req, res) {
         data;
 
     if (!projectExists(project)) return res.status(500).send({ error: "Project does not exist" });
-
 
     try {
         data = getConfig(project);
@@ -337,5 +412,52 @@ function object_values(o) {
     }
     return ret;
 }
+
+function object_find(o, fn) {
+    for (var i in o) {
+        if (fn(o[i], i)) return o[i];
+    }
+}
+
+/**
+ *
+ */
+getJSON = function(options, onResult, onError) {
+    //console.log("rest::getJSON");
+
+    var prot = options.port == 443 ? https : http;
+    var req = prot.request(options, function(res) {
+        var output = '';
+        //console.log(options.host + ':' + res.statusCode);
+        res.setEncoding('utf8');
+
+        res.on('data', function(chunk) {
+            output += chunk;
+        });
+
+        res.on('end', function() {
+            var obj = JSON.parse(output);
+            onResult(res.statusCode, obj);
+        });
+    });
+
+    req.on('socket', function(socket) {
+        socket.setTimeout(5000);
+        socket.on('timeout', function() {
+            req.abort();
+            onError();
+        });
+    });
+    //req.setTimeout(3000, function(err) {
+    //    onError(err);
+    //});
+
+    req.on('error', function(err) {
+        //res.send('error: ' + err.message);
+        onError(err);
+    });
+
+    req.end();
+};
 
 module.exports = router;
