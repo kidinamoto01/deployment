@@ -4,7 +4,7 @@ ENV GITHUB_REPO github.com/multiverseHQ/abci_sample/abci_counter/...
 
 ENV COMMAND abci_counter
 
-EXPOSE 46659
+EXPOSE 46658
 
 COPY ./app-entrypoint.sh /
 

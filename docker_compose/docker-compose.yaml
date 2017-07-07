@@ -2,13 +2,18 @@ version: '3'
 services:
   my_app:
     image: multiversecamp/sample_app:latest
+    ports:
+      - "46658:46658"
     environment:
-      - GITHUB_REPO=github.com/multiverseHQ/abci_sample/abci_counter/...
-      - COMMAND=abci_counter
+      - GITHUB_REPO=${MULTIVERSE_GITHUB}
+      - COMMAND=${MULTIVERSE_COMMAND}
     deploy:
       mode: global
   my_proxy:
     image: multiversecamp/proxy:latest
+    ports:
+      - "46659:46659"
+      - "46660:46660"
     deploy:
       mode: global
     environment:
@@ -34,8 +39,8 @@ services:
     - /tmp:/tendermint
     - serve-pubkey:/pubkey
     environment:
-      - VALIDATORS=
-      - SEEDS=0.0.0.0
+      - VALIDATORS=${MULTIVERSE_VALIDATORS}
+      - SEEDS=${MULTIVERSE_SEEDS}
       - PROXY_IP=my_proxy
       - DATA_ROOT=/tendermint
     depends_on:
