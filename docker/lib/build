@@ -7,12 +7,17 @@ DOCKER_TENDERMINT=./Dockerfile.tendermint
 rm $DOCKER_APP
 cp Dockerfile.app.template $DOCKER_APP
 echo "RUN go get -v ${1}/${2}/..." >> $DOCKER_APP
+if [ $# -eq 3 ]
+then
+echo "ok"
+#echo "ENTRYPOINT [\"$2\",$3]" >> $DOCKER_APP
+#echo "ENTRYPOINT [\"basecoin\",\"start\",\"--without-tendermint\"]" >> $DOCKER_APP
+else
 echo "CMD [\"$2\"]" >> $DOCKER_APP
-
-
-
+fi
 # BUILD
 
+echo docker build -f $DOCKER_APP -t app:latest .
 docker build -f $DOCKER_APP -t app:latest .
+echo docker build -f $DOCKER_PROXY -t proxy:latest .
 docker build -f $DOCKER_PROXY -t proxy:latest .
-

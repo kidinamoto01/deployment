@@ -13,7 +13,6 @@ parser = argparse.ArgumentParser(prog='PROG')
 parser.add_argument("-n", "--nodesName", help="node names, coma separated list of nodes", default="1")
 
 parser.add_argument("-i", "--chainId", help="chain unique ID", default="TEST")
-parser.add_argument("-e", "--execname", help="name of the executable", action="store_true", default="abci_counter")
 parser.add_argument("-g", "--gitrepo", help="git repository of the app", action="store_true", default="github.com/multiverseHQ/abci_sample")
 parser.add_argument("-v", "--verbose", help="verbose", action="store_true", default="")
 
@@ -25,6 +24,13 @@ parser_clean = subparsers.add_parser('delete', help='erase a chain')
 parser_build = subparsers.add_parser('delete', help='erase a chain')
 
 parser_create = subparsers.add_parser('create', help='create a chain')
+
+parser_create.add_argument("-e", "--execname", help="name of the executable", default="abci_counter")
+parser_create.add_argument("-f", "--args", help="name of the executable", default="")
+
+
+
+
 parser_create.add_argument("-t", "--tendermintExposedPort", help="exposed tendermint ports", default="46656")
 parser_create.add_argument("-p", "--proxyExposedPort", help="exposed proxy ports", default="46456")
 parser_create.add_argument("-a", "--appExposedPort", help="exposed app ports", default="46256")
@@ -50,7 +56,8 @@ if args.module in ['create'] :
    nodeNames = args.nodesName.split(",")
 
    for n,p,a in map(None,nodeNames, pPorts,aPorts):
-      create = Popen([get_script_path('createOne')]+[args.chainId]+[n,p,a])
+      print([get_script_path('createOne')]+[args.chainId]+[n,p,a]+[args.execname,args.args])
+      create = Popen([get_script_path('createOne')]+[args.chainId]+[n,p,a]+[args.execname,args.args])
       create.wait()
 
    sleep = Popen(['sleep','3'])

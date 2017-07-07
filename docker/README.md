@@ -14,6 +14,10 @@ USE THE TERRAFORM API
 1. Create a project : `http://url_tera_instance_api/create?nodes=[1,2]&project=31&git=github.com/multiverseHQ/abci_sample&app=abci_counter`
 2. List details about project : `http://url_tera_instance_api/list?project=30`
 
+3. 
+init -g=github.com/multiverseHQ/abci_sample -a=abci_counter -p=007 -n=1 -i=34.230.35.150,54.175.25.187 --tendermintPort=46656 --proxyPort=46658 --appPort=46659
+init -g=github.com/tendermint/basecoin/cmd -a=basecoin -b="--address=tcp://0.0.0.0:4665 start --without-tendermint" -p=007 -n=1 -i=34.230.35.150,54.175.25.187 --tendermintPort=46656 --proxyPort=46658 --appPort=46659
+
 
 # Usage tendermintGenerator
 

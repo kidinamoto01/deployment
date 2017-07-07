@@ -4,6 +4,8 @@ CHAIN_ID=$1
 SUFFIX=$2
 PROXY_PORT=$3
 APP_PORT=$4
+EXEC=$(echo $5 | sed s/\"//g)
+ARGS=$(echo $6 | sed s/\"//g)
 
 SCREEN_NAME=screen$1
 
@@ -21,7 +23,7 @@ VOLUME_PATH=/home/ec2-user/deployment/docker/volumes/$TENDERMINT_DATA
 mkdir  $VOLUME_PATH
 
 echo "Launching app"
-cmdApp="docker run -p $APP_PORT:$APP_PORT -it --name app$CHAIN_ID$SUFFIX --net=$NETWORK_NAME app; exec bash"
+cmdApp="docker run -p $APP_PORT:$APP_PORT -it --name app$CHAIN_ID$SUFFIX --net=$NETWORK_NAME app $EXEC $ARGS; exec bash"
 echo $cmdApp
 screen -dmS app$CHAIN_ID$SUFFIX bash -c "$cmdApp"
 sleep 1

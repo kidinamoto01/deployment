@@ -14,6 +14,8 @@ parser = argparse.ArgumentParser(prog='PROG')
 
 parser.add_argument("-p", "--project", help="chain unique ID", default="TEST")
 parser.add_argument("-a", "--app", help="name of the executable", default="abci_counter")
+parser.add_argument("-b", "--appArgs", help="executable arguments", default="")
+
 parser.add_argument("-g", "--gitrepo", help="git repository of the app", default="github.com/multiverseHQ/abci_sample")
 parser.add_argument("-n", "--node", help="node", default="test")
 parser.add_argument("-i", "--ips", help="ips", default="127.0.0.1")
@@ -40,7 +42,8 @@ print "---------------- BUILD ---------------"
 build = Popen(
 	[get_script_path('build')]+
 	[args.gitrepo]+
-	[args.app])
+	[args.app]+
+        [args.appArgs])
 
 build.wait()
 
@@ -54,15 +57,21 @@ print "---------------- LAUNCH ---------------"
 #	['-p='+args.proxyPort]+
 #	['-a='+args.appPort])
 
-enableCommunication = Popen(
-	[get_current_path('tendermintGenerator')]+
-	['--nodesName='+args.node]+
-	['--chainId='+args.project]+
-	['create']+
-	['-t='+args.tendermintPort]+
-	['-p='+args.proxyPort]+
-	['-a='+args.appPort]+
-	['-x'])
+cmd = [get_current_path('tendermintGenerator')]+\
+	['--nodesName='+args.node]+\
+	['--chainId='+args.project]+\
+	['create']+\
+	['-t='+args.tendermintPort]+\
+	['-p='+args.proxyPort]+\
+	['-a='+args.appPort]+\
+	['-e=\"'+args.app+'\"']+\
+	['-f=\"'+args.appArgs+'\"']+\
+	['-x']
+
+print(cmd)
+
+
+enableCommunication = Popen(cmd)
 enableCommunication.wait()
 
 
