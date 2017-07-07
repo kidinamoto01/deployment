@@ -22,22 +22,35 @@ mkdir  $VOLUME_PATH
 
 echo "Launching app"
 cmdApp="docker run -p $APP_PORT:$APP_PORT -it --name app$CHAIN_ID$SUFFIX --net=$NETWORK_NAME app; exec bash"
-#echo $cmdApp
+echo $cmdApp
 screen -dmS app$CHAIN_ID$SUFFIX bash -c "$cmdApp"
 sleep 1
 
 echo "Launching proxy"
 cmdProxy="docker run -p 46660:46660 -p $PROXY_PORT:46659 -it --name proxy$CHAIN_ID$SUFFIX --net=$NETWORK_NAME proxy abci_proxy -proxy=tcp://app$CHAIN_ID$SUFFIX:46659 -v; exec bash"
-#echo $cmdProxy
+echo $cmdProxy
 screen -dmS proxy$CHAIN_ID$SUFFIX bash -c "$cmdProxy"
 
 echo "Init tendermint"
-docker run -it --rm --net=$NETWORK_NAME --volume=$VOLUME_PATH:/tendermint tendermint tendermint --home=/tendermint init 
 
+#!/bin/bash
 
-echo "---- volumes "
-echo "-------------"
-ls $VOLUME_PATH/
+#!/bin/bash
+value='0'
+while true; do
+if [ $value == '0' ]
+then
+    echo docker run --name=TENDERMINT_TEMP$TENDERMINT_DATA --net=$NETWORK_NAME --volume=$VOLUME_PATH:/tendermint tendermint tendermint --home=/tendermint init 
+    docker run --name=TENDERMINT_TEMP$TENDERMINT_DATA --net=$NETWORK_NAME --volume=$VOLUME_PATH:/tendermint tendermint tendermint --home=/tendermint init 
+    value=$( ls $VOLUME_PATH | wc -l |tr '\n' ' ')
+    echo "wait"
+    sleep 1
+else
+    break
+fi
+done
+echo "ok"
+docker rm TENDERMINT_TEMP$TENDERMINT_DATA
 
 # $VOLUME_PATH/genesis.json
 #touch $VOLUME_PATH/priv_validator.json
