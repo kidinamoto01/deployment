@@ -8,6 +8,8 @@ RUN go get -v github.com/multiverseHQ/abci_proxy/abci_proxy/...
 
 EXPOSE 46658
 
+EXPOSE 46660
+
 CMD abci_proxy -proxy=tcp://${APP_IP}:46659
 
 #docker build

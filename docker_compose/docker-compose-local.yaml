@@ -9,6 +9,9 @@ services:
       mode: global
   my_proxy:
     build: ./proxy/.
+    ports:
+      - "46658:46658"
+      - "46660:46660"
     deploy:
       mode: global
     environment:
