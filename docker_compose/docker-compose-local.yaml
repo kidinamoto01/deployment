@@ -2,7 +2,8 @@ version: '3'
 services:
   my_app:
     build: ./app/.
-    - "46658:46658"
+    ports:
+      - "46658:46658"
     environment:
       - GITHUB_REPO=${MULTIVERSE_GITHUB}
       - COMMAND=${MULTIVERSE_COMMAND}
