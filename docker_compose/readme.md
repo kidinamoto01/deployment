@@ -6,7 +6,9 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 1. Make sure you have docker and docker-compose installed in your computer
 
-2. Run: curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
+2. Run: 
+
+- curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
 
 3. Type in the shell 4 lines with the Github Repo of your App and the command of your app
 
@@ -23,7 +25,9 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 1. For each Amazon EC2 Instance or Digital Ocean Bucket, make sure you have Docker & Docker-Compose Installed
 
-2. Copy Docker-compose.yml into your servers. Run: curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
+2. Copy Docker-compose.yml into your servers. Run: 
+
+- curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
 
 3. Type in the shell the 4 parameters with the Github Repo of your App,the command of your app and the IP address of your validators & seeds.
 
