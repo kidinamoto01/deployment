@@ -4,6 +4,17 @@ SOME THINGS HARDCODED FOR HACKATHON
 -> exposed port only works for one instance per node
 -> no deletion of volumes when launching debug (easier to not mess up genesis during testing)
 
+00:00 : request launched
+01:30 : building and launching docker
+03:30 : blockchain at block 30
+
+
+USE THE TERRAFORM API 
+
+1. Create a project : `http://url_tera_instance_api/create?nodes=[1,2]&project=31&git=github.com/multiverseHQ/abci_sample&app=abci_counter`
+2. List details about project : `http://url_tera_instance_api/list?project=30`
+
+
 # Usage tendermintGenerator
 
 
