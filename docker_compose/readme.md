@@ -36,7 +36,7 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 - export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3
 - export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3
 
-5. Launch each Tendermint node + ABCi app 
+5. To launch each Tendermint node + ABCi proxy + ABCi app, Run:
 
 - docker-compose up
 
