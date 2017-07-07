@@ -5,6 +5,8 @@ var execSync = require('child_process').execSync;
 var fs = require('fs');
 var http = require("http");
 var https = require("https");
+var unirest = require('unirest');
+
 
 var TERRAFORMAPPLY_CMD = 'terraform apply > tera.log';
 var TERRAFORMAMI = "ami-5ec8cf48";
@@ -36,13 +38,12 @@ function projectExists(project) {
  */
 function getNodesStatus(project, cb) {
     // Call terraform output to retrieve JSON, process it and return result
-
-    console.log("getNodesStatus():", "cd " + getPath(project) + "; terraform output -json");
+    //console.log("getNodesStatus():", "cd " + getPath(project) + "; terraform output -json");
     exec("cd " + getPath(project) + "; terraform output -json", function(error, stdout, stderr) {
         var nodeData, output = { nodes: {} };
 
         try {
-            console.log("Terraform output", stdout);
+            //console.log("Terraform output", stdout);
             nodeData = JSON.parse(stdout);
         } catch (e) {
             console.log("Unable to process Terraform return", e);
@@ -128,11 +129,12 @@ router.get('/create', function(req, res) {
             var ips = object_values(data.nodes).map(function(o) {
                 return o.ip;
             }).join(',');
+
             for (var i in nodes) {
                 var id = nodes[i],
                     node = data.nodes[id];
 
-                var cmd = 'cd deployment/docker;sleep 20 && ./init -g=' + git + ' -a=' + app + ' -p=' + project + ' -n=' + id + ' -i=' + ips + " --tendermintPort=46656 --proxyPort=46658 --appPort=46659 > init.log";
+                var cmd = 'cd deployment/docker;sleep 20 && ./init -g=' + git + ' -a=\\"' + app + '\\" -p=' + project + ' -n=' + id + ' -i=' + ips + " --tendermintPort=46656 --proxyPort=46658 --appPort=46659 > init.log";
                 //var cmd = "touch testfile";
                 console.log("Running ssh on:", node, "cmd: ", cmd);
                 exec("ssh -oStrictHostKeyChecking=no ec2-user@" + node.ip + ' "' + cmd + '"', function(e, stdout, stderr) {
@@ -192,7 +194,14 @@ router.get('/listValidators', function(req, res) {
     }
     //console.log("Terraform configuration refreshed");
 
-    getNodesStatus(req.query.project, function(data) {
+    getValidators(req.query.project, function(data) {
+        res.send(data);
+    });
+});
+
+getValidators = function(project, cb) {
+    getNodesStatus(project, function(data) {
+
         //console.log("got nodes status", data);
         var validators, counter = 1,
             onRequest = function() {
@@ -207,14 +216,10 @@ router.get('/listValidators', function(req, res) {
 
                         if (v) n.voting_power = v.voting_power;
                     }
-                    res.send(data);
-                    counter--;
-                    if (counter === 0) {
-                        res.send(data);
-                    }
+                    cb(data);
                 }
             };
-        // console.log("data.nodes,", data.nodes);
+
         getJSON({ host: object_values(data.nodes)[0].ip, port: 46657, path: '/validators', method: 'GET' },
             function(status, data) {
                 validators = data.result.validators;
@@ -231,11 +236,12 @@ router.get('/listValidators', function(req, res) {
                     node.latest_block_time = data.result.latest_block_time;
                     node.latest_block_hash = data.result.latest_block_hash;
                     node.pub_key = data.result.pub_key;
+                    node.pub_key_enc = data.result.node_info.pub_key;
                     onRequest();
                 }.bind(null, node), onRequest);
         }
     });
-});
+}
 
 
 /**
@@ -294,7 +300,7 @@ router.get('/remove', function(req, res) {
         }
     } else {
         try {
-            execSync("unlink " + getPath(project) + "/node*.tf");
+            execSync("find " + getPath(project) + "/node*.tf -delete");
         } catch (e) {
             console.log('Unlink error: ', e);
         }
@@ -310,6 +316,61 @@ router.get('/remove', function(req, res) {
     });
 
     res.send({});
+});
+
+/**
+ * Add a public key to the cluster of public keys
+ */
+router.get('/promote', function(req, res) {
+
+    if (!validate(req, res, { project: { required: true }, node: { required: true } })) return;
+
+    var project = req.query.project,
+        node = req.query.node;
+
+    getValidators(project, function(data) {
+        //console.log(data);
+
+        var validators = [],
+            height;
+        for (var i in data.nodes) {
+            var n = data.nodes[i];
+
+            console.log("Power", i, node, node === i, data.nodes[i].voting_power)
+
+            if (i === node) {
+                var b = new Buffer(n.pub_key_enc, "hex")
+                console.log(n.pub_key_enc, b.toString('base64'))
+                    //(new Buffer('BD2EB1764E36F8C8E96A5BD4CB341598B16D4F4A8F43AE340AC8F6BD3C7609DB', 'hex')).toString('base64')
+                validators.push({ pubKey: b.toString('base64'), power: 10 })
+            }
+
+            height = n.latest_block_height;
+        }
+        console.log(validators);
+
+        for (var i in data.nodes) {
+            var target = data.nodes[i];
+            console.log(target.ip, height + 10);
+            unirest.post('http://' + target.ip + ':46660/')
+                .headers({ 'Accept': 'application/json', 'Content-Type': 'application/json' })
+                .type('json')
+                .send({
+                    "method": "change_validators",
+                    "jsonrpc": "2.0",
+                    "params": {
+                        "scheduled_height": height + 10,
+                        "validators": validators
+                    },
+                    "id": "dontcare"
+                })
+                .end(function(response) {
+                    console.log(response.body);
+                });
+        }
+
+        res.send({});
+    })
 });
 
 /**
@@ -459,5 +520,16 @@ getJSON = function(options, onResult, onError) {
 
     req.end();
 };
+
+function parseHexString(str) {
+    var result = [];
+    while (str.length >= 8) {
+        result.push(parseInt(str.substring(0, 8), 16));
+
+        str = str.substring(8, str.length);
+    }
+
+    return result;
+}
 
 module.exports = router;
