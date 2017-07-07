@@ -13,13 +13,17 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 3. Type in the shell 4 lines with the Github Repo of your App and the command of your app
 
 - export MULTIVERSE_SEEDS=0.0.0.0
-- export MULTIVERSE_VALIDATORS=
+- export MULTIVERSE_VALIDATORS=""
 - export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/...
 - export MULTIVERSE_COMMAND=abci_counter
 
 4. Run: 
 
 - docker-compose up
+
+5. Optionnal.You can launch the command in only one line:
+
+- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=0.0.0.0 && export MULTIVERSE_VALIDATORS="" && docker-compose up
 
 ## To deploy your ABCi app on X Servers
 
