@@ -53,6 +53,6 @@ for s in "${SEEDS_ARR[@]}"; do
 done
 seeds=$(IFS=','; echo "${seeds[*]}")
 
-exec tendermint node --proxy_app=tcp://${PROXY_IP}:46658 --home=$TMHOME --p2p.seeds=$seeds --log_level "debug"
+exec tendermint node --proxy_app=tcp://${PROXY_IP}:46659 --home=$TMHOME --p2p.seeds=$seeds --log_level "debug"
 
 #exec tendermint node --proxy_app=tcp://${PROXY_IP}:46658 --home=$TMHOME --log_level "debug"

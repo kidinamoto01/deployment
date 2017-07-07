@@ -2,6 +2,7 @@ version: '3'
 services:
   my_app:
     image: multiversecamp/sample_app:latest
+    - "46658:46658"
     environment:
       - GITHUB_REPO=${MULTIVERSE_GITHUB}
       - COMMAND=${MULTIVERSE_COMMAND}
@@ -10,7 +11,7 @@ services:
   my_proxy:
     image: multiversecamp/proxy:latest
     ports:
-      - "46658:46658"
+      - "46659:46659"
       - "46660:46660"
     deploy:
       mode: global
