@@ -10,20 +10,9 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 - curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
 
-3. Type in the shell 4 lines with the Github Repo of your App and the command of your app
+3. Type in the shell thie lines with the 4 correct parameters: MULTIVERSE_SEEDS, MULTIVERSE_VALIDATORS MULTIVERSE_GITHUB, MULTIVERSE_COMMAND
 
-- export MULTIVERSE_SEEDS=0.0.0.0
-- export MULTIVERSE_VALIDATORS=""
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...
-- export MULTIVERSE_COMMAND=abci_counter
-
-4. Run: 
-
-- docker-compose up
-
-5. Optionnal.You can launch the command in only one line:
-
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=0.0.0.0 && export MULTIVERSE_VALIDATORS="" && docker-compose up
+- echo -e 'MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...\nMULTIVERSE_COMMAND=abci_counter\nMULTIVERSE_VALIDATORS=""\nMULTIVERSE_SEEDS=0.0.0.0' > .env && docker-compose up
 
 ## To deploy your ABCi app on X Servers
 
@@ -33,17 +22,6 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 - curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
 
-3. Type in the shell the 4 parameters with the Github Repo of your App,the command of your app and the IP address of your validators & seeds.
+3. Type in the shell thie lines with the 4 correct parameters: MULTIVERSE_SEEDS, MULTIVERSE_VALIDATORS MULTIVERSE_GITHUB, MULTIVERSE_COMMAND for example
 
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...
-- export MULTIVERSE_COMMAND=abci_counter
-- export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3
-- export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3
-
-5. To launch each Tendermint node + ABCi proxy + ABCi app, Run:
-
-- docker-compose up
-
-6. Optionnal. You can launch the command in only one line
-
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3 && export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3 && docker-compose up
+- echo -e 'MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...\nMULTIVERSE_COMMAND=abci_counter\nMULTIVERSE_VALIDATORS="192.168.0.2,192.168.0.3"\nMULTIVERSE_SEEDS=192.168.0.2,192.168.0.3' > .env && docker-compose up
