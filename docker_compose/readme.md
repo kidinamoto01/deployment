@@ -16,7 +16,7 @@ curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deplo
 
 1. For each Amazon EC2 Instance or Digital Ocean Bucket, make sure you have Docker & Docker-Compose Installed
 
-2. Type in the shell thie lines with the 4 correct parameters: MULTIVERSE_SEEDS, MULTIVERSE_VALIDATORS MULTIVERSE_GITHUB, MULTIVERSE_COMMAND
+2. Type in the shell this line with the 4 correct parameters: MULTIVERSE_SEEDS, MULTIVERSE_VALIDATORS MULTIVERSE_GITHUB, MULTIVERSE_COMMAND
 
 For example:
 

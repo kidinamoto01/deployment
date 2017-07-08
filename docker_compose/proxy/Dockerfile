@@ -11,6 +11,3 @@ EXPOSE 46659
 EXPOSE 46660
 
 CMD abci_proxy -proxy=tcp://${APP_IP}:46658
-
-#docker build
-# docker run -it -e APP=0.0.0.0 monday_proxy
