@@ -63,7 +63,6 @@ cmd = [get_current_path('tendermintGenerator')]+\
 	['-p='+args.proxyPort]+\
 	['-a='+args.appPort]+\
 	['-e=\"'+args.app+'\"']+\
-	['-f=\"'+args.appArgs+'\"']+\
 	['-x']
 
 print(cmd)
