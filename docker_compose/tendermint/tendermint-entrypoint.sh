@@ -38,7 +38,7 @@ if [ ! -f /tendermint/priv_validator.json ]; then
 	  set -e
 	
 	  # add validator to genesis file along with its pub_key
-	  curl -s "http://$v/pub_key.json" | jq ". as \$k | {pub_key: \"$k\", amount: 10, name: \"$v\"}" > /tendermint/new_pub_validator.json
+	  curl -s "http://$v/pub_key.json" | jq ". as \$k | {pub_key: \$k, amount: 10, name: \"$v\"}" > /tendermint/new_pub_validator.json
 	  cat /tendermint/genesis.json | jq ".validators |= .+ [$(cat /tendermint/new_pub_validator.json)]" > /tendermint/tmpgenesis && mv /tendermint/tmpgenesis /tendermint/genesis.json
 	  rm /tendermint/new_pub_validator.json
 	done
