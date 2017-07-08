@@ -14,7 +14,7 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 - export MULTIVERSE_SEEDS=0.0.0.0
 - export MULTIVERSE_VALIDATORS=""
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/...
+- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...
 - export MULTIVERSE_COMMAND=abci_counter
 
 4. Run: 
@@ -23,7 +23,7 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 5. Optionnal.You can launch the command in only one line:
 
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=0.0.0.0 && export MULTIVERSE_VALIDATORS="" && docker-compose up
+- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=0.0.0.0 && export MULTIVERSE_VALIDATORS="" && docker-compose up
 
 ## To deploy your ABCi app on X Servers
 
@@ -35,7 +35,7 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 3. Type in the shell the 4 parameters with the Github Repo of your App,the command of your app and the IP address of your validators & seeds.
 
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/...
+- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...
 - export MULTIVERSE_COMMAND=abci_counter
 - export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3
 - export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3
@@ -46,4 +46,4 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 6. Optionnal. You can launch the command in only one line
 
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3 && export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3 && docker-compose up
+- export MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3 && export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3 && docker-compose up
