@@ -26,8 +26,6 @@ parser_build = subparsers.add_parser('delete', help='erase a chain')
 parser_create = subparsers.add_parser('create', help='create a chain')
 
 parser_create.add_argument("-e", "--execname", help="name of the executable", default="abci_counter")
-parser_create.add_argument("-f", "--args", help="name of the executable", default="")
-
 
 
 
@@ -56,8 +54,8 @@ if args.module in ['create'] :
    nodeNames = args.nodesName.split(",")
 
    for n,p,a in map(None,nodeNames, pPorts,aPorts):
-      print([get_script_path('createOne')]+[args.chainId]+[n,p,a]+[args.execname,args.args])
-      create = Popen([get_script_path('createOne')]+[args.chainId]+[n,p,a]+[args.execname,args.args])
+      print([get_script_path('createOne')]+[args.chainId]+[n,p,a]+[args.execname])
+      create = Popen([get_script_path('createOne')]+[args.chainId]+[n,p,a]+[args.execname])
       create.wait()
 
    sleep = Popen(['sleep','3'])

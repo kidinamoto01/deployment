@@ -14,7 +14,6 @@ parser = argparse.ArgumentParser(prog='PROG')
 
 parser.add_argument("-p", "--project", help="chain unique ID", default="TEST")
 parser.add_argument("-a", "--app", help="name of the executable", default="abci_counter")
-parser.add_argument("-b", "--appArgs", help="executable arguments", default="")
 
 parser.add_argument("-g", "--gitrepo", help="git repository of the app", default="github.com/multiverseHQ/abci_sample")
 parser.add_argument("-n", "--node", help="node", default="test")
@@ -42,8 +41,7 @@ print "---------------- BUILD ---------------"
 build = Popen(
 	[get_script_path('build')]+
 	[args.gitrepo]+
-	[args.app]+
-        [args.appArgs])
+	[args.app])
 
 build.wait()
 

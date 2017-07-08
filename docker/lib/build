@@ -6,7 +6,7 @@ DOCKER_TENDERMINT=./Dockerfile.tendermint
 
 rm $DOCKER_APP
 cp Dockerfile.app.template $DOCKER_APP
-echo "RUN go get -v ${1}/${2}/..." >> $DOCKER_APP
+echo "RUN go get -v ${1}" >> $DOCKER_APP
 echo docker build -f $DOCKER_APP -t app:latest .
 docker build -f $DOCKER_APP -t app:latest .
 echo docker build -f $DOCKER_PROXY -t proxy:latest .
