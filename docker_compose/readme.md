@@ -6,44 +6,20 @@ Deploy in one command Tendermint + ABCi Proxy + ABCi App.
 
 1. Make sure you have docker and docker-compose installed in your computer
 
-2. Run: 
+2. Type in the shell this line
 
-- curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
-
-3. Type in the shell 4 lines with the Github Repo of your App and the command of your app
-
-- export MULTIVERSE_SEEDS=0.0.0.0
-- export MULTIVERSE_VALIDATORS=""
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/...
-- export MULTIVERSE_COMMAND=abci_counter
-
-4. Run: 
-
-- docker-compose up
-
-5. Optionnal.You can launch the command in only one line:
-
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=0.0.0.0 && export MULTIVERSE_VALIDATORS="" && docker-compose up
+```
+curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml && echo -e 'MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...\nMULTIVERSE_COMMAND=abci_counter\nMULTIVERSE_VALIDATORS=\nMULTIVERSE_SEEDS=0.0.0.0' > .env && docker-compose up
+```
 
 ## To deploy your ABCi app on X Servers
 
 1. For each Amazon EC2 Instance or Digital Ocean Bucket, make sure you have Docker & Docker-Compose Installed
 
-2. Copy Docker-compose.yml into your servers. Run: 
+2. Type in the shell this line with the 4 correct parameters: MULTIVERSE_SEEDS, MULTIVERSE_VALIDATORS MULTIVERSE_GITHUB, MULTIVERSE_COMMAND
 
-- curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml
+For example:
 
-3. Type in the shell the 4 parameters with the Github Repo of your App,the command of your app and the IP address of your validators & seeds.
-
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/...
-- export MULTIVERSE_COMMAND=abci_counter
-- export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3
-- export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3
-
-5. To launch each Tendermint node + ABCi proxy + ABCi app, Run:
-
-- docker-compose up
-
-6. Optionnal. You can launch the command in only one line
-
-- export MULTIVERSE_GITHUB=github.com/multiverseHQ/abci_sample/abci_counter/... && export MULTIVERSE_COMMAND=abci_counter && export MULTIVERSE_SEEDS=192.168.0.2,192.168.0.3 && export MULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3 && docker-compose up
+```
+curl -o docker-compose.yaml https://raw.githubusercontent.com/multiverseHQ/deployment/master/docker_compose/docker-compose.yaml && echo -e 'MULTIVERSE_GITHUB=github.com/multiverseHQ/demo_app/abci_counter/...\nMULTIVERSE_COMMAND=abci_counter\nMULTIVERSE_VALIDATORS=192.168.0.2,192.168.0.3\nMULTIVERSE_SEEDS=192.168.0.2,192.168.0.3' > .env && docker-compose up
+```
