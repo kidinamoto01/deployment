@@ -9,7 +9,7 @@ var unirest = require('unirest');
 
 
 var TERRAFORMAPPLY_CMD = 'terraform apply > tera.log';
-var TERRAFORMAMI = "ami-5ec8cf48";
+var TERRAFORMAMI = "ami-54454442";
 var DATAPATH = __dirname + "/data";
 
 //do catch all getnodesstatus
@@ -46,7 +46,7 @@ function getNodesStatus(project, cb) {
             //console.log("Terraform output", stdout);
             nodeData = JSON.parse(stdout);
         } catch (e) {
-            console.log("Unable to process Terraform return", e);
+            console.log("Unable to process Terraform return", e.message);
             //res.send({ error: "Unable to process Terraform return" });
             output.error = "Unable to process Terraform return";
             cb(output);
@@ -119,8 +119,11 @@ router.get('/create', function(req, res) {
         });
     }
 
+
+    var error;
     exec("cd " + getPath(project) + ";" + TERRAFORMAPPLY_CMD, function(err, stdout, stderr) {
         if (err) {
+            error = err;
             return console.log("Error applying terraform:120", err);
             //return console.log(err);
         }
@@ -134,7 +137,7 @@ router.get('/create', function(req, res) {
                 var id = nodes[i],
                     node = data.nodes[id];
 
-                var cmd = 'cd deployment/docker;sleep 20 && ./init -g=' + git + ' -a=\\"' + app + '\\" -p=' + project + ' -n=' + id + ' -i=' + ips + " --tendermintPort=46656 --proxyPort=46658 --appPort=46659 > init.log";
+                var cmd = 'cd deployment/docker;sleep 20 && ./init -g=' + git + ' -a=\\"' + app + '\\" -p=' + project + ' -n=' + id + ' -i=' + ips + " --tendermintPort=46656 --proxyPort=46659 --appPort=46658 > init.log";
                 //var cmd = "touch testfile";
                 console.log("Running ssh on:", node, "cmd: ", cmd);
                 exec("ssh -oStrictHostKeyChecking=no ec2-user@" + node.ip + ' "' + cmd + '"', function(e, stdout, stderr) {
@@ -144,7 +147,12 @@ router.get('/create', function(req, res) {
         });
     });
 
-    res.send({});
+    setTimeout(function() {
+        if (error) {
+            error.msg = error.message;
+            res.status(500).send({ error: error });
+        } else res.send({});
+    }, 2000);
 });
 
 
@@ -163,7 +171,7 @@ router.get('/list', function(req, res) {
     try {
         var stdout = execSync("cd " + getPath(req.query.project) + "; terraform refresh");
     } catch (e) {
-        console.log("'terraform refresh' failed", e);
+        console.log("'terraform refresh' failed", e.message);
         return res.send({ error: "Terraform is not able to perform the requested operation" });
     }
     //console.log("Terraform configuration refreshed");
@@ -189,7 +197,7 @@ router.get('/listValidators', function(req, res) {
     try {
         var stdout = execSync("cd " + getPath(req.query.project) + "; terraform refresh");
     } catch (e) {
-        console.log("'terraform refresh' failed", e);
+        console.log("'terraform refresh' failed", e.message);
         return res.send({ error: "Terraform is not able to perform the requested operation" });
     }
     //console.log("Terraform configuration refreshed");
@@ -201,6 +209,8 @@ router.get('/listValidators', function(req, res) {
 
 getValidators = function(project, cb) {
     getNodesStatus(project, function(data) {
+
+        if (data.error) return cb(data);
 
         //console.log("got nodes status", data);
         var validators, counter = 1,
@@ -322,6 +332,7 @@ router.get('/remove', function(req, res) {
  * Add a public key to the cluster of public keys
  */
 router.get('/promote', function(req, res) {
+    console.log("Entering /promote");
 
     if (!validate(req, res, { project: { required: true }, node: { required: true } })) return;
 
@@ -331,6 +342,8 @@ router.get('/promote', function(req, res) {
     getValidators(project, function(data) {
         //console.log(data);
 
+        if (data.error) return res.status(500).send({ error: "Unable to retrive instances state" })
+
         var validators = [],
             height;
         for (var i in data.nodes) {
@@ -339,10 +352,10 @@ router.get('/promote', function(req, res) {
             console.log("Power", i, node, node === i, data.nodes[i].voting_power)
 
             if (i === node) {
-                var b = new Buffer(n.pub_key_enc, "hex")
-                console.log(n.pub_key_enc, b.toString('base64'))
-                    //(new Buffer('BD2EB1764E36F8C8E96A5BD4CB341598B16D4F4A8F43AE340AC8F6BD3C7609DB', 'hex')).toString('base64')
-                validators.push({ pubKey: b.toString('base64'), power: 10 })
+                //var b = new Buffer(n.pub_key_enc, "hex")
+                //console.log(n.pub_key_enc, b.toString('base64'))
+                //(new Buffer('BD2EB1764E36F8C8E96A5BD4CB341598B16D4F4A8F43AE340AC8F6BD3C7609DB', 'hex')).toString('base64')
+                validators.push({ pub_key: n.pub_key, power: 10 })
             }
 
             height = n.latest_block_height;
@@ -377,7 +390,7 @@ router.get('/promote', function(req, res) {
  * Add a public key to the cluster of public keys
  */
 router.get('/addPublicKey', function(req, res) {
-    console.log("Entering addPublicKey")
+    console.log("Entering /addPublicKey")
 
     if (!validate(req, res, { project: { required: true }, key: { required: true } })) return;
 
