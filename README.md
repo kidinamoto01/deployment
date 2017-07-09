@@ -9,7 +9,7 @@
 
 ## Lately
 
-We simplify the work and we use now only the docker-compose command (one line) and Digital Ocean API. 
+We simplify the work and we use now only the docker-compose command (one line) and Digital Ocean API directly from front-end. Much simpler setup.
 
 We use the user-data command during creation so **we don't need to log into the machine after creation to deploy the node. That's very very cool.**
 
