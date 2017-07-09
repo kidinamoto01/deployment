@@ -2,7 +2,7 @@
 
 ## At the beginning of the hackethon
 
- we wrote a first version of deployment with a Python Script and we wrote a Nodejs Server to orchestrate the deployment 
+We wrote a first version of deployment with a Python Script and we wrote a Nodejs Server to orchestrate the deployment 
 - Python Tendermint Blockchain Generator (https://github.com/multiverseHQ/deployment/tree/master/docker)
 - Orchestration Server with Terraform (https://github.com/multiverseHQ/deployment/tree/master/server)
 
