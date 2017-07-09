@@ -1,11 +1,15 @@
 # Our work about Tendermint Deployment
 
-At the beginning of the hackethon, we wrote a first version of deployment with a Python Script and we wrote a Nodejs Server to orchestrate the deployment 
+## At the beginning of the hackethon
+
+ we wrote a first version of deployment with a Python Script and we wrote a Nodejs Server to orchestrate the deployment 
 - Python Tendermint Blockchain Generator (https://github.com/multiverseHQ/deployment/tree/master/docker)
 - Orchestration Server with Terraform (https://github.com/multiverseHQ/deployment/tree/master/server)
 
 
-At the end, we simplify the work and we use now only the docker-compose command (one line) and the create API of Digital Ocean. We use the user-data command during creation so we don't need to log into the machine after creation to deploy the node. That's very very cool :)) 
+## Lately
+
+We simplify the work and we use now only the docker-compose command (one line) and the create API of Digital Ocean. We use the user-data command during creation so we don't need to log into the machine after creation to deploy the node. That's very very cool :)) 
 
 - Docker-Compose Deployment (https://github.com/multiverseHQ/deployment/tree/master/docker_compose)
 - https://github.com/multiverseHQ/front-end/tree/digi (check the DIGI Branch)
