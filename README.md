@@ -11,7 +11,7 @@ We wrote a first version of deployment with a Python Script and we wrote a Nodej
 
 We simplify the work and we use now only the docker-compose command (one line) and Digital Ocean API directly from front-end. Much simpler setup.
 
-We use the user-data command during creation so **we don't need to log into the machine after creation to deploy the tendermint node + ABCi app. That's very very cool.**
+We use the user-data command during creation so **we don't need to log into the machine after creation to deploy the tendermint node + ABCi app.**
 
 - Docker-Compose Deployment (https://github.com/multiverseHQ/deployment/tree/master/docker_compose)
 - https://github.com/multiverseHQ/front-end/tree/digi (check the DIGI Branch)
