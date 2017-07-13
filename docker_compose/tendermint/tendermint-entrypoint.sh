@@ -28,24 +28,12 @@ if [ ! -f /tendermint/priv_validator.json ]; then
 	  # wait until validator generates priv/pub key pair
 	  set +e
 	
-	  curl -s "http://$v/pub_key.json" > /dev/null
+	  curl -s --fail "http://$v/pub_key.json" > /dev/null
 	  ERR=$?
-
-	  if curl -s "http://$v/pub_key.json" | grep "404 Not Found"
-			then
-			ERR=10
-	  fi
-
 	  while [ "$ERR" != 0 ]; do
 	    sleep 5
-	    curl -s "http://$v/pub_key.json" > /dev/null
+	    curl -s --fail "http://$v/pub_key.json" > /dev/null
 	    ERR=$?
-
-	    if curl -s "http://$v/pub_key.json" | grep "404 Not Found"
-			then
-			ERR=10
-		fi
-
 	  done
 	  set -e
 	
